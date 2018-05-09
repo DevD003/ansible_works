@@ -1,0 +1,11 @@
+--- #Installing jdk-8u171 through rpm file
+- name: Copy Java RPM file
+  copy:
+     src: jdk-8u171-linux-x64.rpm
+     dest: /tmp/jdk-8u171-linux-x64_bin.rpm
+
+- name: Install JDK via RPM file with yum
+  yum:
+    name: /tmp/jdk-8u171-linux-x64_bin.rpm  
+    state: present
+ 

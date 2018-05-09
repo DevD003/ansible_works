@@ -1,0 +1,13 @@
+--- #<<< Statrting ---Cassandra--- installation >>>
+ - hosts: aws-webservers
+   gather_facts: yes
+   remote_user: ec2-user
+   become: yes
+   become_method: sudo
+   connection: ssh
+   vars:
+    cluster_name: test_cluster
+    seeds: 127.0.0.0
+   roles:
+    - java_installation
+    - cassandra_installation

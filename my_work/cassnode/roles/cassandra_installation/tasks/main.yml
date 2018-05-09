@@ -1,0 +1,31 @@
+--- #Installing Cassandra
+- name: Copy Cassandra repo file
+  copy: 
+    src: cassandra.repo.d
+    dest: /etc/yum.repos.d/cassandra.repo
+    owner: root
+    group: root
+    mode: 0644
+    become: yes
+
+- name: Install Cassandra Packages
+  yum: name=cassandra state=installed
+  become: true
+
+- name: Override cassandra.yaml file
+  template: 
+    src: cassandra.yaml 
+    dest: apache-cassandra-3.11.2/conf/
+      
+- name: Run Cassandra 
+  command: ./cassandra -fR
+  args:
+    chdir: /home/ec2-user/apache-cassandra-3.11.2/bin/
+  notify:
+    - Restart Cassandra
+
+handlers:
+- name: Restart Cassandra
+  service:
+    name: cassandra
+    state: restarted 
