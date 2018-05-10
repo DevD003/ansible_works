@@ -1,6 +1,4 @@
 [aws-webservers]
-13.127.1.226
-35.154.11.168
-13.126.46.0
-
-
+ip-172-31-39-58.us-east-2.compute.internal
+ip-172-31-33-51.us-east-2.compute.internal
+ip-172-31-47-225.us-east-2.compute.internal

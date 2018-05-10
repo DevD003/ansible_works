@@ -7,7 +7,7 @@
 
 # The name of the cluster. This is mainly used to prevent machines in
 # one logical cluster from joining another.
-cluster_name: {{ cluster_name }}
+cluster_name: 'test_cluster'
 
 # This defines the number of tokens randomly assigned to this node on the ring
 # The more tokens, relative to other nodes, the larger the proportion of data
@@ -169,7 +169,7 @@ credentials_validity_in_ms: 2000
 # completes. If credentials_validity_in_ms is non-zero, then this must be
 # also.
 # Defaults to the same value as credentials_validity_in_ms.
-# credentials_update_interval_in_ms: 2000
+ #credentials_update_interval_in_ms: 2000
 
 # The partitioner is responsible for distributing groups of rows (by
 # partition key) across nodes in the cluster.  You should leave this
@@ -596,7 +596,7 @@ ssl_storage_port: 7001
 #
 # Setting listen_address to 0.0.0.0 is always wrong.
 #
-listen_address: {{ aws_webservers }}
+listen_address: 18.221.131.99
 
 # Set listen_address OR listen_interface, not both. Interfaces must correspond
 # to a single address, IP aliasing is not supported.
@@ -673,7 +673,7 @@ start_rpc: false
 # set broadcast_rpc_address to a value other than 0.0.0.0.
 #
 # For security reasons, you should not expose this port to the internet.  Firewall it if needed.
-rpc_address: {{ aws_webservers }}
+rpc_address: 127.0.0.1
 
 # Set rpc_address OR rpc_interface, not both. Interfaces must correspond
 # to a single address, IP aliasing is not supported.
