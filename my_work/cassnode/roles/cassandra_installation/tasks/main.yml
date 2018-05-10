@@ -25,12 +25,14 @@
   become: yes
   command: sysctl -w vm.max_map_count=1048575
 
-- name: Changing .../data, .../commit permissions
-  shell: sudo -u cassandra /usr/sbin/cassandra -f
-  shell: sudo chown -R cassandra:cassandra /var/lib/cassandra/commitlog
-  shell: sudo chown -R cassandra:cassandra /var/lib/cassandra/data
+- name: Creating /mnt/cassandra/data
+  become: yes
+  become_method: sudo
+  command: mkdir -p /mnt/cassandra/data/
+  command: chown -R cassandra:cassandra /mnt/cassandra/data/  
 
 - name: Restart Cassandra
+  become: yes
   service:
     name: cassandra
     state: restarted
