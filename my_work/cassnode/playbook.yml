@@ -1,7 +1,7 @@
 --- #<<< Statrting ---Cassandra--- installation >>>
  - hosts: aws-webservers
    gather_facts: yes
-   remote_user: ec2-user
+   remote_user: test
    become: yes
    become_method: sudo
    connection: ssh
