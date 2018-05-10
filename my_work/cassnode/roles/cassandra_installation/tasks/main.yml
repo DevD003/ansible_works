@@ -20,4 +20,17 @@
   service:
     name: cassandra
     state: started
-    
+
+- name: Changing the vm.max_map_count
+  become: yes
+  command: sysctl -w vm.max_map_count=1048575
+
+- name: Changing .../data, .../commit permissions
+  shell: sudo -u cassandra /usr/sbin/cassandra -f
+  shell: sudo chown -R cassandra:cassandra /var/lib/cassandra/commitlog
+  shell: sudo chown -R cassandra:cassandra /var/lib/cassandra/data
+
+- name: Restart Cassandra
+  service:
+    name: cassandra
+    state: restarted
