@@ -1,0 +1,12 @@
+---
+ - hosts: all
+   become: true
+   gather_facts: yes
+   tasks:
+    - name: sample test
+      blockinfile:
+       path: /etc/hosts
+       block: |
+         hello 
+         hola
+         bye
