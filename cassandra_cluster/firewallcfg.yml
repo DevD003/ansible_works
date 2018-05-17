@@ -1,5 +1,5 @@
 --- #<<configuring firewall>>
-- hosts: all
+- hosts: '{{cluster_host}}'
   gather_facts: yes
   become: yes
   become_method: sudo
@@ -12,6 +12,18 @@
      service: 
        name: firewalld
        state: started
+   - name: open ports
+     firewalld:
+       port: "{{item}}"
+       permanent: true
+       state: enabled
+     with_items:
+       - 7000/tcp
+       - 9042/tcp
+   - name: reload Firewalld
+     shell: firewall-cmd --reload
+     become: yes
+ 
 
 
  
