@@ -1,0 +1,10 @@
+--- #<<< Starting ---Cassandra--- installation >>>
+ - hosts:  nodes
+   gather_facts: yes
+   become: yes
+   vars:
+    cluster_name: test_cluster
+    seeds: 10.1.53.98,10.1.53.100
+   roles:
+    - javainstall
+    - cassandra_installation

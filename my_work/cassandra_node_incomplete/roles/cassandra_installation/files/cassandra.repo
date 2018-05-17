@@ -1,0 +1,5 @@
+[cassandra]
+name=Apache Cassandra
+baseurl=https://www.apache.org/dist/cassandra/redhat/3112/
+gpgcheck=0
+gpgkey=https://www.apache.org/dist/cassandra/KEYS

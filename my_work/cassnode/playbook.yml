@@ -1,0 +1,13 @@
+--- #<<< Starting ---Cassandra--- installation >>>
+ - hosts: aws-webservers
+   gather_facts: yes
+   remote_user: test
+   become: yes
+   become_method: sudo
+   connection: ssh
+   vars:
+    cluster_name: test_cluster
+    seeds: 127.0.0.1
+   roles:
+    - java_installation
+    - cassandra_installation

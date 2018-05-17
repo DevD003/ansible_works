@@ -1,0 +1,38 @@
+--- #Installing Cassandra
+- name: Copy Cassandra repo file
+  copy: 
+    src: cassandra.repo
+    dest: /etc/yum.repos.d/cassandra.repo
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Cassandra Packages
+  yum: name=cassandra state=installed
+  become: true
+
+- name: Override cassandra.yaml file
+  template: 
+    src: cassandra.yaml 
+    dest: /etc/cassandra/conf/
+      
+- name: Run Cassandra 
+  service:
+    name: cassandra
+    state: started
+
+- name: Changing the vm.max_map_count
+  become: yes
+  command: sysctl -w vm.max_map_count=1048575
+
+- name: Creating /mnt/cassandra/data
+  become: yes
+  become_method: sudo
+  command: mkdir -p /mnt/cassandra/data/
+  command: chown -R cassandra:cassandra /mnt/cassandra/data/  
+
+- name: Restart Cassandra
+  become: yes
+  service:
+    name: cassandra
+    state: restarted
