@@ -1,8 +1,7 @@
 --- #<<< Given IP based node - Java and Cassandra Standalone installation >>>
- - hosts: '{{my_ip}}'
+ - hosts: all
    gather_facts: yes
-   remote_user: '{{user}}' 
-   become: yes
+   become: True
    become_method: sudo
    tasks:
     - name: Installing required packages
@@ -63,6 +62,7 @@
 #       - waiting for server to restart
         
    handlers:
+
 #    - name: restart server
 #      shell: sleep 2 && shutdown -r now "Ansible Updates triggered"
 #      async: 1
