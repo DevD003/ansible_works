@@ -1,0 +1,15 @@
+--- #Defaults across the Configuration Parameters
+
+#name of the cluster
+cluster_name: "Test_cluster"
+
+#Seed <ip>(s)
+seed_ip: 
+
+#endpoint_snitch: SimpleSnitch for  single DC or GossipFileSnitch for Multiple DC
+endpoint_snitch: "SimpleSnitch"
+
+#auto_bootstrap: True or False (False - preferred)
+auto_bootstrap: false 
+
+

@@ -1,0 +1,9 @@
+--- #Get the IpV4 addresses of the specified hosts
+- hosts: Test_Cluster 
+  tasks:
+    - debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
+    - debug: var=hostvars[inventory_hostname]['ansible_default_ipv6']['address']  
+    - setup:
+         filter: ansible_default_ipv4.address
+
+
