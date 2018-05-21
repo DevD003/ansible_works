@@ -1,0 +1,2 @@
+--- # << Main Playbook to Configure Cassandra Cluster in the Given Hosts>>
+ - hosts: all
