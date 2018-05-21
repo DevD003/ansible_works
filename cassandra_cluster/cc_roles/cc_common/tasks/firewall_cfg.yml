@@ -1,5 +1,5 @@
 --- #<<configuring firewall>>
-- hosts: '{{cluster_host}}'
+- hosts: all 
   gather_facts: yes
   become: yes
   become_method: sudo

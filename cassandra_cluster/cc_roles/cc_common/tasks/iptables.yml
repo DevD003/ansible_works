@@ -34,16 +34,15 @@
        state: restarted
    - name: IPtable configuration
      become: yes
-     shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 7000,9042 -m state --state NEW,ESTABLISHED -j ACCEPT
+     shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 7000 -m state --state NEW,ESTABLISHED -j ACCEPT
+     shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 9042 -m st
+ate --state NEW,ESTABLISHED -j ACCEPT
      with_items:
-        - 10.1.53.100
-     register: result
-   - debug: var=result
+        - {{ hostvars[host]['ansible_eth0']['ipv4']['address'] }} 
+     
    - name: saving iptables
      shell: service iptables save
-     shell: systemctl enable firewalld
      shell: systemctl start firewalld
-     shell: systemctl enable iptables
      shell: systemctl start iptables 
      register: result
    - debug: var=result
