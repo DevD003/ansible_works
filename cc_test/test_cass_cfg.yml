@@ -1,0 +1,20 @@
+--- # Configuring Cassandra - Conf. Template and Permissions
+- name: <<Configuring Cassandra>>
+  hosts: all 
+  gather_facts: yes
+  become: yes
+  become_method: sudo
+  tasks: 
+    - name: host
+      debug: var= "{{ item }}" 
+      with_items:
+        - "{{ groups['test_Cluster'] }}"
+      debug: var=hostvars[inventory_hostname].ansible_eth0.ipv4.address
+      # display the ipv4 of the host
+      debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
+      debug: var=hostvars[inventory_hostname]['inventory_hostname']
+      debug: var=hostvars[inventory_hostname]["group_names"]
+      debug: var=hostvars[inventory_hostname]["group_names"][0]
+
+
+ 

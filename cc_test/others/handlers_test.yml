@@ -1,0 +1,32 @@
+--- #Get the IpV4 addresses of the specified hosts
+- hosts: seed_nodes
+  gather_facts: yes
+  become: yes
+  tasks:
+    - debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
+    - name: notifying
+      shell: systemctl stop cassandra 
+      notify: 
+        - restart server
+        - wait for server to restart 
+        - restart cassandra  
+  handlers:
+
+    - name: restart server
+      shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+      async: 1
+      poll: 0
+      ignore_errors: True
+ 
+    - name: wait for server to restart
+      local_action: wait_for
+        host={{ inventory_hostname }}
+        port=22
+        state=started
+        delay=10
+        timeout=300
+      sudo: False
+      
+    - name: restart cassandra
+      shell: service cassandra start
+

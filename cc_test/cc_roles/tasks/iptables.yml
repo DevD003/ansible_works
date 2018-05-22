@@ -4,18 +4,6 @@
   become: yes
   become_method: sudo
   tasks:
-   - name:  firewalld
-     yum:
-       name: firewalld
-       state: installed
-   - name: enabling firewalld
-     service:
-       name: firewalld
-       enabled: yes
-   - name: starting firewalld
-     service:
-       name: firewalld
-       state: started 
    - name: Installing iptables service
      yum: 
       name: iptables-services
@@ -28,21 +16,15 @@
      service:
        name: iptables
        state: started
-   - name: starting firewalld
-     service:
-       name: firewalld
-       state: restarted
    - name: IPtable configuration
      become: yes
      shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 7000 -m state --state NEW,ESTABLISHED -j ACCEPT
-     shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 9042 -m st
-ate --state NEW,ESTABLISHED -j ACCEPT
+     shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 9042 -m state --state NEW,ESTABLISHED -j ACCEPT
      with_items:
         - {{ hostvars[host]['ansible_eth0']['ipv4']['address'] }} 
      
    - name: saving iptables
      shell: service iptables save
      shell: systemctl start firewalld
-     shell: systemctl start iptables 
      register: result
    - debug: var=result

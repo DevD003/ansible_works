@@ -1,0 +1,24 @@
+--- # Configuring Cassandra - Conf. Template and Permissions
+- name: <<Configuring Cassandra>>
+  hosts: all 
+  gather_facts: yes
+  become: yes
+  become_method: sudo
+
+  tasks:
+
+   - name: Checking Vars Debug - Test
+      debug: cluster={{ hostvars[inventory_hostname] }}
+      debug: seeds ={{ hostvars['seed_nodes']['ansible_eth0']['ipv4']['address'] }
+      debug: listen ={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address']}}
+      
+
+
+
+
+
+
+ 
+
+
+ 

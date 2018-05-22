@@ -1,17 +1,19 @@
---- #<<configuring firewall>>
-- hosts: all 
+--- #<<configuring firewall on all the given nodes>>>
+- name: <<Enable 7000 and 9042 TCP ports for node <-> node communication>>
+  hosts: all 
   gather_facts: yes
   become: yes
   become_method: sudo
+
   tasks:
+
    - name: Enable Firewalld
      service: 
        name: firewalld
        enabled: yes
-   - name: start Firewalld
-     service: 
-       name: firewalld
-       state: started
+     notify: 
+         - Start Firewalld
+
    - name: open ports
      firewalld:
        port: "{{item}}"
@@ -20,9 +22,8 @@
      with_items:
        - 7000/tcp
        - 9042/tcp
-   - name: reload Firewalld
-     shell: firewall-cmd --reload
-     become: yes
+     notify:
+       - Reload Firewalld
  
 
 

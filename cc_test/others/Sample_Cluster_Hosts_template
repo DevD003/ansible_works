@@ -1,0 +1,11 @@
+#Provide the name of the cluster in pace of <cluster_name>
+[cluster_name:children]
+seed_nodes
+peer_nodes
+
+[seed_nodes]
+#Provide the <IP> of the seeds >>
+
+[peer_nodes]
+#provide the other_node(s) <IP> in cluster with above seed_nodes provided >>
+
