@@ -1,0 +1,67 @@
+--- # handlers file for handling misc. fns from the tasks
+
+- name: Enable Firewalld
+  become: yes
+  service:
+  name: firewalld
+  enabled: yes
+ 
+- name: Start Firewalld 
+  service:
+    name: firewalld
+    state: started
+                   
+- name: Stop Firewalld
+  service:
+    name: firewalld
+    status: stopped
+
+- name: Restart Firewalld
+  service:
+    name: firewalld
+    status: restarted
+
+- name: Reload Firewalld
+  become: yes
+  shell: firewall-cmd --reload 
+
+- name: Enable iptables service
+  service:
+    name: iptables
+    enabled: yes
+
+- name: Start iptables service
+  service:
+    name: iptables
+    state: started
+
+- name: Restart iptables service
+  service:
+    name: iptables
+    state: restarted 
+
+- name: Save iptable configuration 
+  shell: service iptables save                      
+ 
+- name: Restart Server
+  shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+  async: 1
+  poll: 0
+  ignore_errors: True
+  
+- name: Wait for Server to Restart
+  local_action: wait_for
+       host={{ inventory_hostname }}
+       port=22
+       state=started
+       delay=10
+       timeout=300
+  sudo: False
+
+- name: Stop Cassandra Service
+  become: yes
+  shell: systemctl stop cassandra  
+
+- name: Restart Cassandra Service
+  become: yes
+  shell: systemctl restart cassandra

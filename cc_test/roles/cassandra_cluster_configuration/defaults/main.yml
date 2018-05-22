@@ -4,16 +4,23 @@
 #Cassandra Cluster name >>>
 cluster_name: "Test_cluster"
 
-#Seed_ip >>> 
-seed_ip: {{ hostvars['seed_nodes']['ansible_eth0']['ipv4']['address'] }}
+#Cassandra Machine Owner >>> (default - root)
+cassandra_user: root
+
+#Cassandra Machine Group >>> (default - root)
+cassandra_group: root
+
+
+#Seed_ip >>> (Provide the seed ip(s) seperated by ',')
+seed_ip: ["10.1.53.98"]
 
 # endpoint_snitch >>> (set either, Case Sensitive)
 # SimpleSnitch for  single DC or GossipFileSnitch for Multiple DC 
  endpoint_snitch: "SimpleSnitch"
 
 # listen address: Gives the node an address to listen to >>>
-listen_address: {{hostvars[inventory_hostname]['ansible_default_ipv4']['address']}}
-
+listen_address: {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+ 
 # rpc_address: Deals with the client communicatons to node 
 rpc_address: {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
 

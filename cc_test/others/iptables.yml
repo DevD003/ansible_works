@@ -4,27 +4,22 @@
   become: yes
   become_method: sudo
   tasks:
+
    - name: Installing iptables service
      yum: 
       name: iptables-services
       state: latest
-   - name: Enabling iptables service
-     service:
-       name: iptables
-       enabled: yes
-   - name: Starting iptables
-     service:
-       name: iptables
-       state: started
+     notify:
+        - Enable iptables service
+        - Start iptables service
+
    - name: IPtable configuration
      become: yes
      shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 7000 -m state --state NEW,ESTABLISHED -j ACCEPT
      shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 9042 -m state --state NEW,ESTABLISHED -j ACCEPT
      with_items:
-        - {{ hostvars[host]['ansible_eth0']['ipv4']['address'] }} 
+       - {{ hostvars[host]['ansible_eth0']['ipv4']['address'] }} 
+     notify:
+       - Save iptable configuration
+       - Restart iptables service    
      
-   - name: saving iptables
-     shell: service iptables save
-     shell: systemctl start firewalld
-     register: result
-   - debug: var=result

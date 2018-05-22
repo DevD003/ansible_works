@@ -1,6 +1,0 @@
---- # << Main Playbook to Configure Cassandra Cluster in the Given Hosts>>
- - include: linux_cfg.yml
- - include: firewall_ports.yml
- - include: iptable_cfg.yml
- - include: cassandra_cfg.yml
- 
