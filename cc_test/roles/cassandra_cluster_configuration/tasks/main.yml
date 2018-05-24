@@ -1,9 +1,9 @@
 --- #<< Main Playbook to Configure Cassandra Cluster in the Given Hosts>>
-- name: Stop Firewall to Configure Linux-Selinux
-  service: firewalld
-  state: stopped
-  notify:
-      - Stop Firewalld
+#- name: Stop Firewall to Configure Linux-Selinux
+#  service: firewalld
+#  state: stopped
+#  notify:
+#      - Stop Firewalld
 
 - name: Disable Selinux
   selinux:
@@ -14,13 +14,14 @@
       - Wait for Server to Restart
       - Restart Firewalld
 
-- name: <<Enable 7000 and 9042 TCP ports for node <-> node communication>>
+#- name: <<Enable 7000 and 9042 TCP ports for node <-> node communication>>
 
 - name: Ensure Firewalld is enabled
+  shell:  systemctl status firewalld
   notify:
-      - Enable Firewalld
+      - Enable firewalld
 
-- name: adding ip(s) with 7000 and 9042 to iptable
+#- name: adding ip(s) with 7000 and 9042 to iptable
 
 - name: Adding Port(s) 7000 and 9042 to firewall rules
   firewalld:
@@ -36,9 +37,10 @@
 
 - name: Installing iptables service
   yum:
-    name: iptables-services
+    name:
+      - iptables-services
     state: latest
-    notify:
+  notify:
        - Enable iptables service
        - Start iptables service
 
@@ -47,14 +49,15 @@
   shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 7000 -m state --state NEW,ESTABLISHED -j ACCEPT
   shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 9042 -m state --state NEW,ESTABLISHED -j ACCEPT
   with_items:
-     - "{{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}"
+     - "{{ hostvars[ '{{groups['all']}}' ]['ansible_eth0']['ipv4']['address'] }}"
   notify:
      - Saving iptables service
      - Restart iptables service 
 
-- name: Configuring Cassandra - Conf. Template and Permissions
-- name: <<Configuring Cassandra>>
+#- name: Configuring Cassandra - Conf. Template and Permissions
+#- name: <<Configuring Cassandra>>
 - name: Ensure Cassandra is not running
+  shell: service cassandra start
   notify:
       - Stop Cassandra Service
 
@@ -65,9 +68,9 @@
       owner: "{{cassandra_user}}"
       group: "{{cassandra_group}}"
       mode: 0644
-   with_items:
-      - "cassandra.yaml"
-   notify:
+  with_items:
+        - "cassandra.yaml"
+  notify:
        - Restart Cassandra Service
       
 

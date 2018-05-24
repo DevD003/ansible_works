@@ -1,10 +1,10 @@
 --- # handlers file for handling misc. fns from the tasks
 
-- name: Enable Firewalld
+- name: Enable firewalld
   become: yes
   service:
-  name: firewalld
-  enabled: yes
+     name: firewalld
+     enabled: yes
  
 - name: Start Firewalld 
   service:
@@ -61,6 +61,12 @@
 - name: Stop Cassandra Service
   become: yes
   shell: systemctl stop cassandra  
+
+- name: Enable firewalld
+  become: yes
+  service:
+    name: firewalld
+    enabled: yes  
 
 - name: Restart Cassandra Service
   become: yes

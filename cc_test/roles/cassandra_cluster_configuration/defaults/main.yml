@@ -16,13 +16,13 @@ seed_ip: ["10.1.53.98"]
 
 # endpoint_snitch >>> (set either, Case Sensitive)
 # SimpleSnitch for  single DC or GossipFileSnitch for Multiple DC 
- endpoint_snitch: "SimpleSnitch"
+endpoint_snitch: "SimpleSnitch"
 
 # listen address: Gives the node an address to listen to >>>
-listen_address: {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+listen_address: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
  
 # rpc_address: Deals with the client communicatons to node 
-rpc_address: {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+rpc_address: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
 
 # auto_bootstrap >>> True or False (False - preferred)
 auto_bootstrap: false 

@@ -2,6 +2,6 @@
 - hosts: all
   gather_facts: yes
   become: yes
-  become_method: yes
+  become_method: sudo
   roles:
     - cassandra_cluster_configuration

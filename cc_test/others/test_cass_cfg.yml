@@ -5,16 +5,20 @@
   become: yes
   become_method: sudo
   tasks: 
-    - name: host
-      debug: var= "{{ item }}" 
-      with_items:
-        - "{{ groups['test_Cluster'] }}"
-      debug: var=hostvars[inventory_hostname].ansible_eth0.ipv4.address
-      # display the ipv4 of the host
+    - name: host ipv4 other-form enq
       debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
-      debug: var=hostvars[inventory_hostname]['inventory_hostname']
-      debug: var=hostvars[inventory_hostname]["group_names"]
-      debug: var=hostvars[inventory_hostname]["group_names"][0]
+    - name: adding iptables
+      shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 9042 -m state --state NEW,ESTABLISHED -j ACCEPT
+      with_items:
+         - "{{ hostvars[ '{{ item }}' ]['ansible_default_ipv4']['address'] }}"
+        loop:   
+           -  "{{ groups['all'] }}"
+#    - name: Inventory host name
+#      debug: var=hostvars[inventory_hostname]['inventory_hostname']
+#    - name: group names
+#      debug: var=hostvars[inventory_hostname]["group_names"]
+#    - specific group name
+#      debug: var=hostvars[inventory_hostname]["group_names"][0]
 
 
  
