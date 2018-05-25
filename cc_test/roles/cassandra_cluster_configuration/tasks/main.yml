@@ -1,9 +1,4 @@
 --- #<< Main Playbook to Configure Cassandra Cluster in the Given Hosts>>
-#- name: Stop Firewall to Configure Linux-Selinux
-#  service: firewalld
-#  state: stopped
-#  notify:
-#      - Stop Firewalld
 
 - name: Disable Selinux
   selinux:
@@ -14,14 +9,8 @@
       - Wait for Server to Restart
       - Restart Firewalld
 
-#- name: <<Enable 7000 and 9042 TCP ports for node <-> node communication>>
-
-- name: Ensure Firewalld is enabled
-  shell:  systemctl status firewalld
-  notify:
-      - Enable firewalld
-
-#- name: adding ip(s) with 7000 and 9042 to iptable
+- name: <<start Firewall>>
+  shell: systemctl restart firewalld 
 
 - name: Adding Port(s) 7000 and 9042 to firewall rules
   firewalld:
@@ -44,32 +33,57 @@
        - Enable iptables service
        - Start iptables service
 
-- name: IPtable configuration
-  become: yes
-  shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 7000 -m state --state NEW,ESTABLISHED -j ACCEPT
-  shell: iptables -A INPUT -p tcp -s '{{item}}' -m multiport --dports 9042 -m state --state NEW,ESTABLISHED -j ACCEPT
+- name: IPtable configuration - <7000> listen port
+  iptables:
+     action: append
+     chain: INPUT
+     comment: "Cassandra_listen_port"
+     ctstate: NEW,ESTABLISHED
+     protocol: tcp
+     match: tcp
+     destination_port: 7000
+     jump: ACCEPT
+     source: '{{ item }}'
+  when: item != inventory_hostname
   with_items:
-     - "{{ hostvars[ '{{groups['all']}}' ]['ansible_eth0']['ipv4']['address'] }}"
+           - "{{ groups['all'] }}"
   notify:
-     - Saving iptables service
-     - Restart iptables service 
+     - Save iptable configuration
+
+- name: IPtable configuration - <9042> native transport port
+  iptables:
+     action: append
+     chain: INPUT
+     comment: "Cassandra_Native_Transport_port"
+     ctstate: NEW,ESTABLISHED
+     protocol: tcp
+     match: tcp
+     destination_port: 9042
+     jump: ACCEPT
+     source: '{{ item }}'
+  when: item != inventory_hostname
+  with_items:
+           - "{{ groups['all'] }}"
+  notify:
+     - Save iptable configuration
 
 #- name: Configuring Cassandra - Conf. Template and Permissions
 #- name: <<Configuring Cassandra>>
 - name: Ensure Cassandra is not running
-  shell: service cassandra start
+  shell: clear
   notify:
       - Stop Cassandra Service
 
+- name: Clearing preconfigured cassandra properties
+  
+
 - name: Updating Cassandra Configuration
   template:
-      src: "{{item}}.j2"
-      dest: /etc/cassandra/conf/"{{item}}"
+      src: cassandra.yaml.j2 
+      dest: /etc/cassandra/conf/cassandra.yaml
       owner: "{{cassandra_user}}"
       group: "{{cassandra_group}}"
       mode: 0644
-  with_items:
-        - "cassandra.yaml"
   notify:
        - Restart Cassandra Service
       

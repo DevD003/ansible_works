@@ -1,0 +1,38 @@
+--- # Configuring Cassandra - Conf. Template and Permissions
+- name: <<Configuring Cassandra>>
+  hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+#    - name: host ipv4 address
+#      debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
+
+     - name: debug
+       debug:
+         var: '{{ item }}'
+       with_items:
+           - groups['all']
+
+     - iptables:
+         action: append
+         chain: INPUT
+         comment: "Test2 new"
+         ctstate: NEW,ESTABLISHED
+         protocol: tcp
+         match: tcp
+         destination_port: 7000
+         jump: ACCEPT
+         source: '{{ item }}'
+       when: item != inventory_hostname
+       with_items:
+           - "{{ groups['all'] }}"
+         
+#       shell: iptables -A INPUT -p tcp -s 10.1.53.53 -m multiport --dports 8000,9042,7000 -m state --state NEW,ESTABLISHED -j ACCEPT -m comment --comment "Testcase"
+#       shell: iptables -A INPUT -p tcp -s '{{ item }}' -m multiport --dports 8000 -m state --state NEW,ESTABLISHED -j ACCEPT -m comment --comment "Testcase"
+#       with_items:
+#          -  groups['test_Cluster']
+       register: result
+     - name:  
+       shell: service iptables save
+     
+     - debug: var=result
