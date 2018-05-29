@@ -1,0 +1,90 @@
+--- #<< Main Playbook to Configure Cassandra Cluster in the Given Hosts>>
+
+- name: Disable Selinux
+  selinux:
+     policy=targeted
+     state=disabled
+  notify:
+      - Restart Server
+      - Wait for Server to Restart
+      - Restart Firewalld
+
+- name: <<start Firewall>>
+  shell: systemctl restart firewalld 
+
+- name: Adding Port(s) 7000 and 9042 to firewall rules
+  firewalld:
+     port: "{{item}}"
+     permanent: true
+     state: enabled
+  with_items:
+     - 7000/tcp
+     - 9042/tcp
+  notify:
+     - Reload Firewalld
+     - Restart Firewalld
+
+- name: Installing iptables service
+  yum:
+    name:
+      - iptables-services
+    state: latest
+  notify:
+       - Enable iptables service
+       - Start iptables service
+
+- name: IPtable configuration - <7000> listen port
+  iptables:
+     action: append
+     chain: INPUT
+     comment: "Cassandra_listen_port"
+     ctstate: NEW,ESTABLISHED
+     protocol: tcp
+     match: tcp
+     destination_port: 7000
+     jump: ACCEPT
+     source: '{{ item }}'
+  when: item != inventory_hostname
+  with_items:
+           - "{{ groups['all'] }}"
+  notify:
+     - Save iptable configuration
+
+- name: IPtable configuration - <9042> native transport port
+  iptables:
+     action: append
+     chain: INPUT
+     comment: "Cassandra_Native_Transport_port"
+     ctstate: NEW,ESTABLISHED
+     protocol: tcp
+     match: tcp
+     destination_port: 9042
+     jump: ACCEPT
+     source: '{{ item }}'
+  when: item != inventory_hostname
+  with_items:
+           - "{{ groups['all'] }}"
+  notify:
+     - Save iptable configuration
+
+#- name: Configuring Cassandra - Conf. Template and Permissions
+#- name: <<Configuring Cassandra>>
+- name: Ensure Cassandra is not running
+  shell: clear
+  notify:
+      - Stop Cassandra Service
+
+- name: Clearing preconfigured cassandra properties
+  shell: rm -rf /var/lib/cassandra/data/system/*  
+
+- name: Updating Cassandra Configuration
+  template:
+      src: cassandra.yaml.j2 
+      dest: /root/
+      owner: "{{cassandra_user}}"
+      group: "{{cassandra_group}}"
+      mode: 0644
+  notify:
+       - Restart Cassandra Service
+      
+
