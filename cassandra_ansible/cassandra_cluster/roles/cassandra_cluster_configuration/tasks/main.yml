@@ -75,7 +75,7 @@
       - Stop Cassandra Service
 
 - name: Clearing preconfigured cassandra properties
-  
+  shell: rm -rf /var/lib/cassandra/data/system/*  
 
 - name: Updating Cassandra Configuration
   template:
