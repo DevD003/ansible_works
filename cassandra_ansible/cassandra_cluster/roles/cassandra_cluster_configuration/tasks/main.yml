@@ -5,9 +5,9 @@
      policy=targeted
      state=disabled
   notify:
-      - Restart Server
-      - Wait for Server to Restart
-      - Restart Firewalld
+      - Restart_Server
+      - Wait_for_Server_to_Restart
+      - Restart_Firewalld
 
 - name: <<start Firewall>>
   shell: systemctl restart firewalld 
@@ -21,8 +21,8 @@
      - 7000/tcp
      - 9042/tcp
   notify:
-     - Reload Firewalld
-     - Restart Firewalld
+     - Reload_Firewalld
+     - Restart_Firewalld
 
 - name: Installing iptables service
   yum:
@@ -30,8 +30,8 @@
       - iptables-services
     state: latest
   notify:
-       - Enable iptables service
-       - Start iptables service
+       - Enable_iptables_service
+       - Start_iptables_service
 
 - name: IPtable configuration - <7000> listen port
   iptables:
@@ -48,7 +48,7 @@
   with_items:
            - "{{ groups['all'] }}"
   notify:
-     - Save iptable configuration
+     - Save_iptable_configuration
 
 - name: IPtable configuration - <9042> native transport port
   iptables:
@@ -65,17 +65,21 @@
   with_items:
            - "{{ groups['all'] }}"
   notify:
-     - Save iptable configuration
+     - Save_iptable_configuration
 
 #- name: Configuring Cassandra - Conf. Template and Permissions
 #- name: <<Configuring Cassandra>>
 - name: Ensure Cassandra is not running
   shell: clear
   notify:
-      - Stop Cassandra Service
+      - Stop_Cassandra_Service
 
-- name: Clearing preconfigured cassandra properties
+- name: Clearing preconfigured cassandra properties << Old DATA & Commitlogs!!! >>
+  become: yes
+  shell: nodetool decommission
+  shell: rm -rf /var/log/cassandra/*
   shell: rm -rf /var/lib/cassandra/data/system/*  
+  shell: rm -rf /var/lib/cassandra/commitlog/*  
 
 - name: Updating Cassandra Configuration
   template:
@@ -85,6 +89,6 @@
       group: "{{cassandra_group}}"
       mode: 0644
   notify:
-       - Restart Cassandra Service
+       - Restart_Cassandra_Service
       
 

@@ -1,0 +1,14 @@
+#Provide the name of the cluster in pace of <cluster_name>
+[TESTING:children]
+seed_nodes
+peer_nodes
+
+[seed_nodes]
+#Provide the <IP> of the seeds >>
+10.1.53.98
+
+
+[peer_nodes]
+#provide the other_node(s) <IP> in cluster with above seed_nodes provided >>
+10.1.53.102
+10.1.53.100

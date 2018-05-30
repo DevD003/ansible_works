@@ -24,9 +24,6 @@
     - name: Installing Cassandra
       yum: name=cassandra-3.11.2-1.noarch.rpm state=present
        
-#    - name: Stop Firewall
-#      command: systemctl stop firewalld
-   
     - name: Starting Cassandra
       service:
         name: cassandra

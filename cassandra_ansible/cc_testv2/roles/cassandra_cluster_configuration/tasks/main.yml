@@ -80,7 +80,7 @@
 - name: Updating Cassandra Configuration
   template:
       src: cassandra.yaml.j2 
-      dest: /root/
+      dest: /etc/cassandra/conf/cassandra.yaml
       owner: "{{cassandra_user}}"
       group: "{{cassandra_group}}"
       mode: 0644

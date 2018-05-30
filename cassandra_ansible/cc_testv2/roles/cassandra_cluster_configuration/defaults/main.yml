@@ -2,7 +2,7 @@
 # Variables Listed here are applicable to all host groups
 
 #Cassandra Cluster name >>>
-cluster_name: "Test_cluster"
+cluster_name: "{{ hostvars[inventory_hostname]['group_names'][0] }}"
 
 #Cassandra Machine Owner >>> (default - root)
 cassandra_user: root
@@ -12,7 +12,7 @@ cassandra_group: root
 
 
 #Seed_ip >>> (Provide the seed ip(s) seperated by ',')
-seed_ip: ["{{ groups['seed_nodes'] }}"]
+seed_ip: "{{ groups['seed_nodes'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(',')  }}"
 
 # endpoint_snitch >>> (set either, Case Sensitive)
 # SimpleSnitch for  single DC or GossipFileSnitch for Multiple DC 
