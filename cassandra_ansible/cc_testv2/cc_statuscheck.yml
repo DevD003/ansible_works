@@ -1,0 +1,11 @@
+--- # Main Playbook to Configure Cassandra Cluster
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+   - name: cassandra status on node 
+     command: service cassandra status
+     register: node_status
+
+   - debug: var=node_status
+

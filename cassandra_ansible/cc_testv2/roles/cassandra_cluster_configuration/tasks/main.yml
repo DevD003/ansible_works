@@ -7,7 +7,6 @@
   notify:
       - Restart Server
       - Wait for Server to Restart
-      - Restart Firewalld
 
 - name: <<start Firewall>>
   shell: systemctl restart firewalld 
@@ -67,24 +66,29 @@
   notify:
      - Save iptable configuration
 
-#- name: Configuring Cassandra - Conf. Template and Permissions
-#- name: <<Configuring Cassandra>>
 - name: Ensure Cassandra is not running
-  shell: clear
-  notify:
-      - Stop Cassandra Service
+  service: 
+    name: cassandra
+    state: stopped
 
-- name: Clearing preconfigured cassandra properties
-  shell: rm -rf /var/lib/cassandra/data/system/*  
+#- name: Clearing preconfigured cassandra properties << Old DATA & Commitlog !!!>>
+#  command: nodetool decommission
+#  command: /bin/rm -rf /var/log/cassandra/*
+#  command: /bin/rm -rf /var/lib/cassandra/data/system/*  
+#  command: /bin/rm -rf /var/lib/cassandra/commitlog/*
 
 - name: Updating Cassandra Configuration
   template:
-      src: cassandra.yaml.j2 
+      src: cassandra_v3xx.yaml.j2 
       dest: /etc/cassandra/conf/cassandra.yaml
       owner: "{{cassandra_user}}"
       group: "{{cassandra_group}}"
       mode: 0644
-  notify:
-       - Restart Cassandra Service
+
+- name: Restart Cassandra Service
+# command: /bin/rm -rf /var/lib/cassandra/data/system/*
+  service:
+    name: cassandra
+    state: restarted
       
 
