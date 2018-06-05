@@ -24,8 +24,10 @@
     - name: Installing Cassandra
       yum: name=cassandra-3.11.2-1.noarch.rpm state=present
        
-    - name: Starting Cassandra
-      command: systemctl start cassandra
+#    - name: Starting Cassandra
+#      service:
+#        name=cassandra
+#        state=started
  
     - name: Changing SeLinux to permissive
       selinux:

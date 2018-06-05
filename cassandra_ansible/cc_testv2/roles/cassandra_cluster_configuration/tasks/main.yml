@@ -71,12 +71,6 @@
     name: cassandra
     state: stopped
 
-#- name: Clearing preconfigured cassandra properties << Old DATA & Commitlog !!!>>
-#  command: nodetool decommission
-#  command: /bin/rm -rf /var/log/cassandra/*
-#  command: /bin/rm -rf /var/lib/cassandra/data/system/*  
-#  command: /bin/rm -rf /var/lib/cassandra/commitlog/*
-
 - name: Updating Cassandra Configuration
   template:
       src: cassandra_v3xx.yaml.j2 
@@ -85,10 +79,19 @@
       group: "{{cassandra_group}}"
       mode: 0644
 
-- name: Restart Cassandra Service
-# command: /bin/rm -rf /var/lib/cassandra/data/system/*
+- name: Clearing preconfigured cassandra properties 
+  command: rm -rf /var/lib/cassandra/data/system/*
+  command: rm -rf /var/lib/cassandra/commitlog/*
+
+- name: Enable Cassandra Service
   service:
     name: cassandra
-    state: restarted
+    enabled: yes
+
+- name: Enable Cassandra Service
+  service:
+    name: cassandra
+    state: restarted  
+  
       
 

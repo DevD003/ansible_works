@@ -1,14 +1,15 @@
 #Provide the name of the cluster in pace of <cluster_name>
-[TESTv2:children]
+[MY_Clust:children]
 seed_nodes
 peer_nodes
 
 [seed_nodes]
 #Provide the <IP> of the seeds >>
-10.1.53.98
-10.1.53.102
+10.1.53.98 #ansible_user=test ansible_ssh_pass=test
+
 
 
 [peer_nodes]
 #provide the other_node(s) <IP> in cluster with above seed_nodes provided >>
-10.1.53.100
+10.1.53.100 #ansible_user=test ansible_ssh_pass=test
+10.1.53.102 #ansible_user=test ansible_ssh_pass=test
