@@ -1,0 +1,26 @@
+--- # Save Hostname of the node to variable 
+- hosts: seed_nodes
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Variable Registering through shell command
+      shell: "echo $HOSTNAME"
+      register: current_hostname
+
+    - name: setting variable name
+      set_fact:
+      string_to_echo: "{{ current_hostname.stdout }}"
+
+    - debug: msg= '{{current_hostname.stdout}}'
+
+    - name: Using the Variable current_hostname 
+      file:
+        path: /root/{{current_hostname.stdout }}.txt
+        state: touch
+    
+    - name: Sending variable into a file
+      copy: 
+         dest: /root/{{current_hostname.stdout}}.txt 
+         content: '{{current_hostname.stdout}}'
+         
+      
