@@ -66,12 +66,12 @@
   notify:
      - Save iptable configuration
 
-- name: Ensure Cassandra is not running
+- name: Ensure Cassandra is not running before configuring
   service: 
     name: cassandra
     state: stopped
 
-- name: Updating Cassandra Configuration
+- name: Updating Cassandra Configuration << /etc/cassandra/conf/cassandra.yaml >>
   template:
       src: cassandra_v3xx.yaml.j2 
       dest: /etc/cassandra/conf/cassandra.yaml
@@ -79,19 +79,15 @@
       group: "{{cassandra_group}}"
       mode: 0644
 
-- name: Clearing preconfigured cassandra properties 
-  command: rm -rf /var/lib/cassandra/data/system/*
-  command: rm -rf /var/lib/cassandra/commitlog/*
+- name: Clearing Cassandra properties << !! Removing Previous Configurations, Cluster Properties, System Data !!>>
+  become: yes 
+  shell: rm -rf /var/lib/cassandra/data/system/*
 
-- name: Enable Cassandra Service
-  service:
-    name: cassandra
-    enabled: yes
-
-- name: Enable Cassandra Service
+- name: Enable and Restart Cassandra Service
   service:
     name: cassandra
     state: restarted  
+  
   
       
 

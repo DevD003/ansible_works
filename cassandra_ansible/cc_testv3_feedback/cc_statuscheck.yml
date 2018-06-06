@@ -1,0 +1,17 @@
+--- # Main Playbook to Configure Cassandra Cluster
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+   - name: cassandra status on node 
+     command: service cassandra status
+     register: node_status
+   - debug: var=node_status
+   - debug: var=node_status["failed"]
+   - debug: var=node_status["stdout"]["Loaded"]
+   - debug: var=node_status["stdout"]["Process"]
+   - debug: var=node_status["stdout"]["Main PID"]
+   - debug: var=node_status["stderr_lines"]
+   - debug: var=node_status["stdout_lines"]
+   - debug: var=node_status["stderr_lines"] 
+

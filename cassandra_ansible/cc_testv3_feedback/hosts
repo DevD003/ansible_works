@@ -1,5 +1,5 @@
 #Provide the name of the cluster in pace of <cluster_name>
-[MY_Clust:children]
+[Cluster_Test_name:children]
 seed_nodes
 peer_nodes
 

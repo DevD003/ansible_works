@@ -5,9 +5,8 @@
      policy=targeted
      state=disabled
   notify:
-      - Restart_Server
-      - Wait_for_Server_to_Restart
-      - Restart_Firewalld
+      - Restart Server
+      - Wait for Server to Restart
 
 - name: <<start Firewall>>
   shell: systemctl restart firewalld 
@@ -21,8 +20,8 @@
      - 7000/tcp
      - 9042/tcp
   notify:
-     - Reload_Firewalld
-     - Restart_Firewalld
+     - Reload Firewalld
+     - Restart Firewalld
 
 - name: Installing iptables service
   yum:
@@ -30,8 +29,8 @@
       - iptables-services
     state: latest
   notify:
-       - Enable_iptables_service
-       - Start_iptables_service
+       - Enable iptables service
+       - Start iptables service
 
 - name: IPtable configuration - <7000> listen port
   iptables:
@@ -48,7 +47,7 @@
   with_items:
            - "{{ groups['all'] }}"
   notify:
-     - Save_iptable_configuration
+     - Save iptable configuration
 
 - name: IPtable configuration - <9042> native transport port
   iptables:
@@ -65,30 +64,30 @@
   with_items:
            - "{{ groups['all'] }}"
   notify:
-     - Save_iptable_configuration
+     - Save iptable configuration
 
-#- name: Configuring Cassandra - Conf. Template and Permissions
-#- name: <<Configuring Cassandra>>
-- name: Ensure Cassandra is not running
-  shell: clear
-  notify:
-      - Stop_Cassandra_Service
+- name: Ensure Cassandra is not running before configuring
+  service: 
+    name: cassandra
+    state: stopped
 
-- name: Clearing preconfigured cassandra properties << Old DATA & Commitlogs!!! >>
-  become: yes
-  shell: nodetool decommission
-  shell: rm -rf /var/log/cassandra/*
-  shell: rm -rf /var/lib/cassandra/data/system/*  
-  shell: rm -rf /var/lib/cassandra/commitlog/*  
-
-- name: Updating Cassandra Configuration
+- name: Updating Cassandra Configuration << /etc/cassandra/conf/cassandra.yaml >>
   template:
-      src: cassandra.yaml.j2 
+      src: cassandra_v3xx.yaml.j2 
       dest: /etc/cassandra/conf/cassandra.yaml
       owner: "{{cassandra_user}}"
       group: "{{cassandra_group}}"
       mode: 0644
-  notify:
-       - Restart_Cassandra_Service
+
+- name: Clearing Cassandra properties << !! Removing Previous Configurations, Cluster Properties, System Data !!>>
+  become: yes 
+  shell: rm -rf /var/lib/cassandra/data/system/*
+
+- name: Enable and Restart Cassandra Service
+  service:
+    name: cassandra
+    state: restarted  
+  
+  
       
 
