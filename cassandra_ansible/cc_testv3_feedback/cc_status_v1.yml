@@ -1,0 +1,74 @@
+--- # Main Playbook to Configure Cassandra Cluster
+- hosts: all
+  gather_facts: yes
+  become: yes
+  vars:
+    servicename: cassandra
+  tasks:
+   - name: Check if Service Exists
+     stat: 'path=/etc/init.d/{{ servicename }}'
+     register: servicestatus
+
+   - name: Show service service status
+     debug: msg= '{{ servicename }} service exists.'
+     when: servicestatus.stat.exists
+   
+#   - debug: var=servicestatus.stat
+
+   - name: ensure cassandra is running
+     service:
+          name: "cassandra"
+          state: started
+          enabled: yes
+     register: cassandra_status
+   - debug: var=cassandra_status    
+   
+   - name: ensure cassandra is running
+     systemd:
+         name: "cassandra"
+         state: started
+         enabled: yes   
+     register: servicectlstatus
+
+   - debug: var=servicectlstatus 
+
+#   - debug: msg="Cassandra is running"
+#     when: cassandra_status.stdout.find("running") != -1
+
+   - name: check for service status
+     shell: service '{{ servicename }}' status
+     register: servicestatus
+
+   - name: Show service service status
+     debug: msg='{{ servicename }} exists.'
+     when: servicestatus.rc | int == 0
+
+   - name: cassandra status on node
+     command: service cassandra status
+     register: node_status
+   
+#   - debug: var=node_status
+
+   - debug: var=node_status["start"]
+   - debug: var=node_status["end"]
+   - debug: var=node_status["rc"]
+
+   - debug: var=node_status["failed"]
+   - debug: var=node_status["stderr"]
+     when: servicestatus.rc | int == 0  
+     notify: 
+         - Display_output_lines  
+
+   - debug: var=node_status["stdout"]
+     when: servicestatus.rc | int != 0 
+     notify:
+         - Display_output_lines
+
+  handlers:
+
+   - name: Display_error_lines 
+     debug: var=node_status["stderr_lines"]
+  
+   - name: Display_output_lines
+     debug: var=node_status["stdout_lines"] 
+

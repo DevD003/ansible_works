@@ -1,0 +1,44 @@
+--- # Main Playbook to Configure Cassandra Cluster
+- hosts: all
+  gather_facts: yes
+  become: yes
+
+  vars:
+    servicename: cassandra
+
+  tasks:
+
+   - name: Check if Service Exists
+     stat: 'path=/etc/init.d/{{ servicename }}'
+     register: servicestatus
+
+   - name: Show service status
+     debug: msg='{{ servicename }} service exists.'
+     when: servicestatus.stat.exists 
+
+   - name: ensure cassandra is running
+     service:
+        name: "{{ servicename }}"
+        state: started
+        enabled: yes
+     register: cassandra_status
+
+   - debug:
+       msg: '{{ item }}'
+     with_items: 
+         - '{{ cassandra_status["name"] }}'  
+         - '{{ cassandra_status["state"] }}'
+         - '{{ cassandra_status["enabled"] }}'
+         - '{{ cassandra_status["failed"] }}'
+         - '{{ cassandra_status["status"]["Id"] }}'
+         - '{{ cassandra_status["status"]["LoadState"] }}'    
+         - '{{ cassandra_status["status"]["ActiveState"] }}' 
+         - '{{ cassandra_status["status"]["MainPID"] }}'  
+         - '{{ cassandra_status["status"]["Result"] }}' 
+         - '{{ cassandra_status["status"]["SubState"] }}' 
+
+#   - name: Show service status
+#     debug: msg='{{ servicename }} service no errors.'
+ 
+#   - debug: msg="Cassandra is running"
+######     when: cassandra_status.stdout.find("running") != -1
