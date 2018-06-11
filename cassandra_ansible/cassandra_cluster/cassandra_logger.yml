@@ -23,12 +23,18 @@
         enabled: yes
      register: cassandra_status
    
-   - name: Cassandra Service Status Registering
-     command: mkdir /home/{{ansible_user}}/{{ hostvars[inventory_hostname]['group_names'][0] }}_{{ cassandra_status["name"] }}
-     chdir: /home/{{ansible_user}}/{{ hostvars[inventory_hostname]['group_names'][0] }}_{{ cassandra_status["name"] }}/ 
-     command: touch {{ cassandra_status["name"] }}.log  
-   - copy: 
-       dest: ./{{ cassandra_status["name"] }}.log
+   - name: Cassandra Service Status Register
+     command: mkdir /home/{{ansible_user}}/cassandra_logs/
+     args:
+       creates: /home/{{ansible_user}}/cassandra_logs/
+ 
+   - chdir: /home/{{ansible_user}}/cassandra_logs/
+     shell: touch cassandra_status.log 
+    
+
+   - name: Cassandra Service Status ---logging---
+     copy: 
+       dest: /home/{{ansible_user}}/cassandra_logs/cassandra_status.log  
        content:
          - Name= {{ cassandra_status.name }}
          - Action= {{ cassandra_status.state }}
@@ -42,9 +48,13 @@
          
 
    - name: Cassandra Error Log File
-     shell: grep -A 1 '^ERROR' /var/log/cassandra/cassandra.log > /home/{{ansible_user}}/{{ hostvars[inventory_hostname]['group_names'][0] }}/{{ cassandra_status["name"] }}_error.log
+     shell: grep -A 1 '^ERROR' /var/log/cassandra/cassandra.log > /home/{{ansible_user}}/cassandra_logs/cassandra_Error.log
      when: cassandra_status.status.ActiveState == 'failed'
    
-   - name: Cassandra Cluster Details File
-     shell: nodetool describecluster > /home/{{ansible_user}}/{{ hostvars[inventory_hostname]['group_names'][0] }}/{{ cassandra_status["name"] }}_cluster.log  
+   - name: Cassandra Cluster Details ---logging---
+     shell: nodetool describecluster > /home/{{ansible_user}}/cassandra_logs/cassandra_cluster.log 
+     when: cassandra_status.status.ActiveState == 'active' and cassandra_status.status.MainPID != 0 and cassandra_status.status.Result == 'success'  
+ 
+   - name: Cassandra Nodetol Status ---logging---
+     shell: nodetool status >> /home/{{ansible_user}}/cassandra_logs/cassandra_cluster.log 
      when: cassandra_status.status.ActiveState == 'active' and cassandra_status.status.MainPID != 0 and cassandra_status.status.Result == 'success'

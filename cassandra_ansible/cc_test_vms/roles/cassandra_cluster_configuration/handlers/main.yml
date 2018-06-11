@@ -17,9 +17,7 @@
     status: stopped
 
 - name: Restart Firewalld
-  service:
-    name: firewalld
-    status: restarted
+  shell: systemctl restart firewalld  
 
 - name: Reload Firewalld
   become: yes
