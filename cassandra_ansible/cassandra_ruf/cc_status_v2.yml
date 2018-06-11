@@ -22,7 +22,7 @@
         state: started
         enabled: yes
      register: cassandra_status
-
+   - debug: var=cassandra_status
    - debug:
        msg: '{{ item }}'
      with_items: 

@@ -83,11 +83,9 @@
   become: yes 
   shell: rm -rf /var/lib/cassandra/data/system/*
 
-- name: Enable and Restart Cassandra Service
-  service:
-    name: cassandra
-    state: restarted  
+- name: Restart Cassandra Service
+  shell: service cassandra restart
   
-  
+   
       
 

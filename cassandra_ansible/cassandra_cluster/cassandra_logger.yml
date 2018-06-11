@@ -1,0 +1,50 @@
+--- # Main Playbook to Configure Cassandra Cluster
+- hosts: all
+  gather_facts: yes
+  become: yes
+
+  vars:
+    servicename: cassandra
+
+  tasks:
+
+   - name: Check if Service Exists
+     stat: 'path=/etc/init.d/{{ servicename }}'
+     register: servicestatus
+
+   - name: Show service status
+     debug: msg='{{ servicename }} service exists.'
+     when: servicestatus.stat.exists 
+
+   - name: ensure cassandra is running
+     service:
+        name: "{{ servicename }}"
+        state: started
+        enabled: yes
+     register: cassandra_status
+   
+   - name: Cassandra Service Status Registering
+     command: touch /root/{{ cassandra_status["name"] }}.log  
+   - copy: 
+       dest: /root/{{ cassandra_status["name"] }}.log
+       content:
+         - Name= {{ cassandra_status.name }}
+         - Action= {{ cassandra_status.state }}
+         - Action_Start_Time= {{ cassandra_status.status.ActiveEnterTimestamp }}
+         - Action_Result= {{ cassandra_status.status.Result }} 
+         - Service_Name= {{ cassandra_status.status.Id }}
+         - Service_Process_ID= {{ cassandra_status.status.MainPID }}  
+         - Service_Load_State= {{ cassandra_status.status.LoadState }}
+         - Service_State= {{ cassandra_status.status.ActiveState }}
+         - Service_Status= {{ cassandra_status.status.SubState }}
+         
+
+   - name: Cassandra Error Log File
+     shell: grep -A 1 '^ERROR' /var/log/cassandra/cassandra.log > /root/{{ cassandra_status["name"] }}_error.log
+     when: cassandra_status.status.ActiveState == 'failed'
+   
+   - name: Casaandra Cluster Details File
+     shell: nodetool describecluster > /root/{{ cassandra_status["name"] }}_cluster.log  
+     when: cassandra_status.status.ActiveState == 'active' and cassandra_status.status.MainPID != 0 and cassandra_status.status.Result == 'success'
+
+
