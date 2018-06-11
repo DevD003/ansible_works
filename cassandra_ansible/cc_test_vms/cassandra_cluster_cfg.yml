@@ -1,6 +1,0 @@
---- # Main Playbook to Configure Cassandra Cluster
-- hosts: all
-  gather_facts: yes
-  become: yes
-  roles:
-    - cassandra_cluster_configuration
