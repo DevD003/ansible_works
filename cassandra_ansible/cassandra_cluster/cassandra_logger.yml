@@ -24,9 +24,11 @@
      register: cassandra_status
    
    - name: Cassandra Service Status Registering
-     command: touch /root/{{ cassandra_status["name"] }}.log  
+     command: mkdir /home/{{ansible_user}}/{{ hostvars[inventory_hostname]['group_names'][0] }}_{{ cassandra_status["name"] }}
+     chdir: /home/{{ansible_user}}/{{ hostvars[inventory_hostname]['group_names'][0] }}_{{ cassandra_status["name"] }}/ 
+     command: touch {{ cassandra_status["name"] }}.log  
    - copy: 
-       dest: /root/{{ cassandra_status["name"] }}.log
+       dest: ./{{ cassandra_status["name"] }}.log
        content:
          - Name= {{ cassandra_status.name }}
          - Action= {{ cassandra_status.state }}
@@ -40,11 +42,9 @@
          
 
    - name: Cassandra Error Log File
-     shell: grep -A 1 '^ERROR' /var/log/cassandra/cassandra.log > /root/{{ cassandra_status["name"] }}_error.log
+     shell: grep -A 1 '^ERROR' /var/log/cassandra/cassandra.log > /home/{{ansible_user}}/{{ hostvars[inventory_hostname]['group_names'][0] }}/{{ cassandra_status["name"] }}_error.log
      when: cassandra_status.status.ActiveState == 'failed'
    
-   - name: Casaandra Cluster Details File
-     shell: nodetool describecluster > /root/{{ cassandra_status["name"] }}_cluster.log  
+   - name: Cassandra Cluster Details File
+     shell: nodetool describecluster > /home/{{ansible_user}}/{{ hostvars[inventory_hostname]['group_names'][0] }}/{{ cassandra_status["name"] }}_cluster.log  
      when: cassandra_status.status.ActiveState == 'active' and cassandra_status.status.MainPID != 0 and cassandra_status.status.Result == 'success'
-
-
