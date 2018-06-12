@@ -3,7 +3,7 @@
 - name: Disable Selinux
   selinux:
      policy=targeted
-     state=disabled
+     state=permissive
   notify:
       - Restart Server
       - Wait for Server to Restart
