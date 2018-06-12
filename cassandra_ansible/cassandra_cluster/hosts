@@ -5,11 +5,11 @@ peer_nodes
 
 [seed_nodes]
 #Provide the <IP> of the seeds >>
-10.1.53.93  #ansible_user=rdops ansible_ssh_pass=rdops@123 ansible_sudo_pass=rdops@123
+10.1.53.155  ansible_user=rdops ansible_ssh_pass=rdops@123 ansible_sudo_pass=rdops@123
 
 
 
 [peer_nodes]
 #provide the other_node(s) <IP> in cluster with above seed_nodes provided >>
-10.1.53.116  #ansible_user=rdops ansible_ssh_pass=rdops@123 ansible_sudo_pass=rdops@123 
-10.1.53.153  #ansible_user=rdops ansible_ssh_pass=rdops@123 ansible_sudo_pass=rdops@123 
+10.1.53.210 ansible_user=rdops ansible_ssh_pass=rdops@123 ansible_sudo_pass=rdops@123 
+10.1.53.222 ansible_user=rdops ansible_ssh_pass=rdops@123 ansible_sudo_pass=rdops@123 

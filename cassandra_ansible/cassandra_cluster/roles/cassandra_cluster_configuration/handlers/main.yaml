@@ -32,6 +32,11 @@
     name: iptables
     state: started
 
+- name: Enable iptables service
+  service: 
+    name: iptables
+    enabled: yes
+
 - name: Restart iptables service
   service:
     name: iptables
