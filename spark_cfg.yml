@@ -1,13 +1,16 @@
 ---
  - hosts: master
+   gather_facts: yes
    tasks:
-      - name: Copying slaves.template to slaves
-        copy:
-          src: /usr/local/spark/conf/slaves.template
-          dest: /usr/local/spark/conf/slaves
+      - name: Creating slaves file
+        become: yes
+        file:
+          path: /usr/local/spark/conf/slaves
+          state: touch
           
     
       - name: Placing slave IPs in slaves
+        become: yes
         lineinfile:
            path: /usr/local/spark/conf/slaves
            line: '{{item}}'
@@ -18,7 +21,7 @@
       - name: Remove localhost from slaves file
         become: yes
         lineinfile:
-           dest: /usr/local/spark/conf/slaves
+           dest: /usr/local/spark/conf/slaves.template
            regexp: "localhost"
            state: absent
 
@@ -31,7 +34,8 @@
 
 
       - name: Start the master
-        shell: sudo ./start-master.sh
+        become: yes
+        shell: ./start-master.sh
         args:
           chdir: /usr/local/spark/sbin
  
@@ -40,4 +44,5 @@
         shell: ./start-slaves.sh
         args:
           chdir: /usr/local/spark/sbin
+        ask_pass: yes
 

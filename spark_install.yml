@@ -2,7 +2,9 @@
  - hosts: all
    gather_facts: yes
    become: yes
-   remote_user: ec2-user
+   vars:
+     user: '{{ ansible_user }}'
+     path: /home/{{ansible_user}}/
    tasks:
      
 
@@ -18,7 +20,7 @@
 
       - name: Installing Scala
         yum:
-          name: /home/ec2-user/scala-2.11.8.rpm
+          name: /home/{{ansible_user}}/scala-2.11.8.rpm
           state: present
 
 
@@ -27,9 +29,9 @@
 
    
       - name: Remove the extracted file
-        shell: rm -rf spark-2.3.0-bin-hadoop2.7
-        args:
-          chdir: /usr/local/spark
+        file:
+          path: /usr/local/spark/spark-2.3.0-bin-hadoop2.7
+          state: absent
 
 
       - name: Downloading Spark
@@ -39,37 +41,37 @@
       - name: Extracting the spark file
         shell: tar -xvf spark-2.3.0-bin-hadoop2.7.tgz
         args:
-          chdir: /home/ec2-user
+          chdir: /home/{{ansible_user}}/
         notify:
             - Remove downloaded tgz files
 
 
       - name: Moving the spark file
-        command: mv /home/ec2-user/spark-2.3.0-bin-hadoop2.7 /usr/local/spark
+        command: mv /home/{{ansible_user}}/spark-2.3.0-bin-hadoop2.7 /usr/local/spark
 
 
       - name: Adding the spark environment to /.bash_profile
         lineinfile:
-            path: /home/ec2-user/.bash_profile
+            path: /home/{{ansible_user}}/.bash_profile
             line: 'export SPARK_HOME=/usr/local/spark'
 
 
       - name: Adding SPARK_HOME to ~/.bash_profile
         lineinfile:
-            path: /home/ec2-user/.bash_profile
+            path: /home/{{ansible_user}}/.bash_profile
             line: 'export PATH=$PATH:$SPARK_HOME/bin'
 
 
       - name: Sourcing the ~/.bash_profile
         shell: . ~/.bash_profile
         args:
-          chdir: /home/ec2-user
+          chdir: /home/{{ansible_user}}/
 
 
       - name: Change the ownership of $SPARK_HOME to user ec2-user
-        shell: chown -R ec2-user /usr/local/spark
+        shell: chown -R '{{ ansible_user }}' /usr/local/spark
         args:
-          chdir: /home/ec2-user
+          chdir: /home/{{ansible_user}}/
 
       
       - name: Updating the spark-env.sh file 
