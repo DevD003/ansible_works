@@ -4,7 +4,6 @@
    gather_facts: yes
    become: yes
    tasks:
-     
 
       - name: Installing Java
         yum:

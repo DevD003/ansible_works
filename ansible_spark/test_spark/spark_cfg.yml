@@ -6,9 +6,11 @@
    tasks:
 
       - name: Copying slaves.template to create slaves
-        copy:
-          src: /usr/local/spark/conf/slaves.template
-          dest: /usr/local/spark/conf/slaves
+        file:
+          path: /usr/local/spark/conf/slaves
+          state: touch
+          owner: root
+          mode: 0644
           
       - name: Placing slave IPs in slaves
         lineinfile:
