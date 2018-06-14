@@ -1,0 +1,14 @@
+---
+ - name: Create do.sh utility
+   template:
+       src: do.sh.j2
+       dest: /opt/bin/do.sh
+       mode: 0744
+   when: inventory_hostname in groups['master']
+
+ - name: ssh config file should be available
+   template: src="config.j2" dest="~/.ssh/config" mode="600"
+
+ - name: start-cluster utility
+   template: src="spark-cluster.sh.j2" dest="{{ install_dir }}/bin/spark-cluster.sh" mode=0744
+   when: inventory_hostname in groups['master']
