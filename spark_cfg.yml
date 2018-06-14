@@ -44,5 +44,4 @@
         shell: ./start-slaves.sh
         args:
           chdir: /usr/local/spark/sbin
-        ask_pass: yes
 

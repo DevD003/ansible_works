@@ -1,13 +1,13 @@
 [master]
 #Provide the IP of the master
-10.1.53.162 ansible_user=dataops ansible_ssh_pass=dataops@123 ansible_sudo_pass=dataops@123
+10.1.53.143 ansible_user=dataops ansible_ssh_pass=dataops@123 ansible_sudo_pass=dataops@123
 
 
 
 [slaves]
 #Provide the IP of the slaves
-10.1.53.129 ansible_user=dataops ansible_ssh_pass=dataops@123 ansible_sudo_pass=dataops@123
-10.1.53.170 ansible_user=dataops ansible_ssh_pass=dataops@123 ansible_sudo_pass=dataops@123
+10.1.53.177 ansible_user=dataops ansible_ssh_pass=dataops@123 ansible_sudo_pass=dataops@123
+10.1.53.79 ansible_user=dataops ansible_ssh_pass=dataops@123 ansible_sudo_pass=dataops@123
 
 
 
