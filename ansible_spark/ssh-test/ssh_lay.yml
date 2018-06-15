@@ -1,6 +1,7 @@
----
+--- # Spark Master Configure 
  - name: Spark setup
    hosts: all
-   remote_user: root
+   gather_facts: yes
+   become: yes
    roles:
      - ssh_task 

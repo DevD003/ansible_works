@@ -2,7 +2,7 @@
  - name: Create do.sh utility
    template:
        src: do.sh.j2
-       dest: /opt/bin/do.sh
+       dest: /usr/bin/do.sh
        mode: 0744
    when: inventory_hostname in groups['master']
 
@@ -20,14 +20,16 @@
    when: inventory_hostname in groups['master']
 
 # - name: Executing do.sh
-#   shell: ./do.sh
+#   shell: ./do.sh 
 #   args:
-#     chdir: /opt/bin/
+#     chdir: /usr/bin/
+#   when: inventory_hostname in groups['master']
 
- - name: Starting spark -all.sh
+ - name: Starting spark cluster .sh
    shell: ./spark-cluster.sh --start
    args:
-      args: /usr/local/spark/sbin/
+      chdir: /usr/local/spark/sbin/
+   when: inventory_hostname in groups['master'] 
        
 
 

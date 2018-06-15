@@ -1,0 +1,52 @@
+--- # NEW SSH SPARK Master ---> Slaves
+ - name: SPARK Master SSH Key Generation
+   hosts: master
+   become: yes
+   gather_facts: yes
+   tasks:
+    - name: generating key
+      shell: ssh-keygen -t rsa -b 4096 -f /root/.ssh/spark_master_key -q -N ""
+      args:
+        chdir: /root/.ssh/
+        creates: /root/.ssh/spark_master_key 
+ 
+    - name: get the public key
+      fetch: 
+       src: /root/.ssh/spark_master_key.pub
+       dest: files/keys/spark_master_key.pub
+       flat: yes
+
+    - name: get the public key
+      fetch: 
+       src: /root/.ssh/spark_master_key
+       dest: files/keys/spark_master_key
+       flat: yes
+                   
+
+ - name: SPARK Slaves SSH Key Deploy
+   hosts: slaves
+   become: True
+   become_user: root
+   tasks:
+    - name: deploy authorized keys
+      authorized_key: 
+       user: root
+       key: "{{ lookup('file', 'files/keys/spark_master_key.pub') }}"
+
+    - name: deploy ssh-keys
+      shell: cat files/keys/spark_master_key.pub >> authorised_keys
+
+    - name: restart sshd service
+      shell: service sshd restart
+        
+
+#    - name: distribute ssh config
+#      template:
+#        src: templates/config_2.j2 
+#        dest: /root/.ssh/config
+
+#    - name: modify /etc/hosts
+#      lineinfile: dest=/etc/hosts state=present line="{{ hostvars[item].openstack.private_v4}} {{ hostvars[item].openstack.name }}"
+#      with_items: "{{ play_hosts }}"
+
+     

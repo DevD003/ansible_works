@@ -32,6 +32,20 @@ while [ "${1+defined}" ]; do
       STOP=true
       shift
       ;;
+    *help* | -h)
+      exit_with_usage
+     exit 0
+     ;;
+    -*)
+     echo "Error: Unknown option: $1" >&2
+     exit 1
+     ;;
+    *)  # No more options
+     break
+     ;;
+  esac
+done
+### Start
 if [ "$START" == "true" ]
 then
    echo ">>> "
@@ -40,6 +54,7 @@ then
    echo ">>> Starting Spark services..."
    cd $SPARK_HOME && ./sbin/start-all.sh
    sleep 10s
+fi
 ### Stop
 if [ "$STOP" == "true" ]
 then
@@ -49,3 +64,4 @@ then
    echo ">>> Stopping SPARK services..."
    cd $SPARK_HOME && ./sbin/stop-all.sh
    sleep 5s
+fi
