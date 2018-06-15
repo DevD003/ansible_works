@@ -1,30 +1,30 @@
----
- - hosts: master
+--- #Play-Book for Spark Master Configuration
+ - name: << Configuing SPARK - Master >>
+   hosts: master
    gather_facts: yes
+   become: yes
    tasks:
-      - name: Creating slaves file
-        become: yes
+
+      - name: Copying slaves.template to create slaves
         file:
           path: /usr/local/spark/conf/slaves
           state: touch
+          owner: root
+          mode: 0644
           
-    
       - name: Placing slave IPs in slaves
-        become: yes
         lineinfile:
            path: /usr/local/spark/conf/slaves
            line: '{{item}}'
         with_items:
               - '{{ groups["slaves"] }}'
-
      
       - name: Remove localhost from slaves file
         become: yes
         lineinfile:
-           dest: /usr/local/spark/conf/slaves.template
+           dest: /usr/local/spark/conf/slaves
            regexp: "localhost"
            state: absent
-
 
       - name: Changing permissions of the slaves file
         become: yes
@@ -32,14 +32,11 @@
         args:
           chdir: /usr/local/spark/conf
 
-
       - name: Start the master
-        become: yes
-        shell: ./start-master.sh
+        shell: sudo ./start-master.sh
         args:
           chdir: /usr/local/spark/sbin
  
-
       - name: Start the slaves
         shell: ./start-slaves.sh
         args:

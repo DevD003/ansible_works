@@ -1,12 +1,9 @@
----
- - hosts: all
+--- # Installation of Spark
+ - name: << NODE ONLY INSTALLATION of SPARK >>
+   hosts: all
    gather_facts: yes
    become: yes
-   vars:
-     user: '{{ ansible_user }}'
-     path: /home/{{ansible_user}}/
    tasks:
-     
 
       - name: Installing Java
         yum:
@@ -15,63 +12,68 @@
 
 
       - name: Downloading scala
-        command: wget http://downloads.lightbend.com/scala/2.11.8/scala-2.11.8.rpm
+        get_url:
+            url: http://downloads.lightbend.com/scala/2.11.8/scala-2.11.8.rpm 
+            dest: /root/scala-2.11.8.rpm 
 
 
       - name: Installing Scala
         yum:
-          name: /home/{{ansible_user}}/scala-2.11.8.rpm
+          name: /root/scala-2.11.8.rpm
           state: present
 
 
       - name: Remove Downloaded Scala file
-        command: rm -rf scala-2.11.8.rpm 
+        file:
+          path: /root/scala-2.11.8.rpm 
+          state: absent 
 
    
       - name: Remove the extracted file
         file:
-          path: /usr/local/spark/spark-2.3.0-bin-hadoop2.7
+          path: /usr/local/spark/spark-2.3.0-bin-hadoop2.7 
           state: absent
 
 
       - name: Downloading Spark
-        command: wget http://www-us.apache.org/dist/spark/spark-2.3.0/spark-2.3.0-bin-hadoop2.7.tgz
+        get_url:
+            url: http://www-us.apache.org/dist/spark/spark-2.3.0/spark-2.3.0-bin-hadoop2.7.tgz
+            dest: /root/spark-2.3.0-bin-hadoop2.7.tgz
 
 
       - name: Extracting the spark file
         shell: tar -xvf spark-2.3.0-bin-hadoop2.7.tgz
         args:
-          chdir: /home/{{ansible_user}}/
+          chdir: /root/
         notify:
             - Remove downloaded tgz files
 
 
       - name: Moving the spark file
-        command: mv /home/{{ansible_user}}/spark-2.3.0-bin-hadoop2.7 /usr/local/spark
+        command: mv /root/spark-2.3.0-bin-hadoop2.7 /usr/local/spark
 
 
       - name: Adding the spark environment to /.bash_profile
         lineinfile:
-            path: /home/{{ansible_user}}/.bash_profile
+            path: /root/.bash_profile
             line: 'export SPARK_HOME=/usr/local/spark'
 
 
       - name: Adding SPARK_HOME to ~/.bash_profile
         lineinfile:
-            path: /home/{{ansible_user}}/.bash_profile
+            path: /root/.bash_profile
             line: 'export PATH=$PATH:$SPARK_HOME/bin'
 
 
       - name: Sourcing the ~/.bash_profile
-        shell: . ~/.bash_profile
-        args:
-          chdir: /home/{{ansible_user}}/
+        shell: source /root/.bash_profile
 
 
-      - name: Change the ownership of $SPARK_HOME to user ec2-user
-        shell: chown -R '{{ ansible_user }}' /usr/local/spark
+      - name: Change the ownership of $SPARK_HOME to user (root -here)
+        shell: chown -R root /usr/local/spark/
         args:
-          chdir: /home/{{ansible_user}}/
+          chdir: /root/
+        
 
       
       - name: Updating the spark-env.sh file 
@@ -87,5 +89,8 @@
 
 
    handlers:
+
       - name: Remove downloaded tgz files
-        command: rm -rf spark-2.3.0-bin-hadoop2.7.tgz
+        file:
+         path: /root/spark-2.3.0-bin-hadoop2.7.tgz
+         state: absent 
