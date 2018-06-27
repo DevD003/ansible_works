@@ -1,0 +1,8 @@
+- import_tasks: OS_update.yml
+  when: "os_package_update == True"
+
+- import_tasks: ssh-config.yml
+  when: "ssh_config_task == True" 
+
+- import_tasks: utilities.yml 
+  when: "install_utilities == True"

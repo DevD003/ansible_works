@@ -1,0 +1,41 @@
+---
+ - name: Installing Required Utilities on ansible nodes >>>
+   yum:
+     name={{item}}
+     state=present
+   with_items: 
+     - epel-release
+   when: ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7'     
+
+ - name: Installing Required Utilities on ansible nodes >>>
+   yum:  
+     name={{item}}
+     state=present
+   with_items:
+    - binutils
+    - compat-libcap1
+    - compat-libstdc++-33
+    - dos2unix
+    - fuse
+    - gcc
+    - gcc-c++
+    - glibc
+    - glibc-devel
+    - iptables-services
+    - java
+    - java-devel
+    - kernel-devel
+    - libaio
+    - libaio-devel
+    - libgcc
+    - libstdc++
+    - libstdc++-devel
+    - lsof
+    - ksh
+    - make
+    - net-tools
+    - perl
+    - python-simplejson
+    - strace
+    - sysstat
+   when: ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7'

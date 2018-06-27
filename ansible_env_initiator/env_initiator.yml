@@ -1,0 +1,9 @@
+--- # Main Playbook to Install,configure,check > dependencies of ansible_nodes
+ - name: Setting up Ansible Nodes Environment <<< Master
+   hosts: all
+   gather_facts: yes
+   become: yes
+   
+   roles:
+     - role: nodes_configuration_common
+   

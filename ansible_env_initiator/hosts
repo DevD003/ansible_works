@@ -1,0 +1,10 @@
+[all:vars]
+os_package_update= True
+ssh_config_task= False
+install_utilities= True
+
+
+[ansible_nodes]
+10.1.53.132
+10.1.53.133
+10.1.53.141
