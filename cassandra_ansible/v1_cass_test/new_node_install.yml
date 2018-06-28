@@ -1,5 +1,5 @@
----
-- name: Installing Cassandra On Node (only)
+--- #Playbook to Install Cassandra in a new node 
+- name: Installing Cassandra On New Node (only)
   hosts: all
   become: true
   gather_facts: false
@@ -24,11 +24,11 @@
     - name: Installing Cassandra
       yum: name=cassandra-3.11.2-1.noarch.rpm state=present
        
-#    - name: Starting Cassandra
-#      service:
-#        name=cassandra
-#        state=started
- 
+    - name: Make Sure Cassandra is Stopped
+      shell: service cassandra stop 
+      notify:
+         - remove_cass_dir_del
+    
     - name: Changing SeLinux to permissive
       selinux:
          policy=targeted
@@ -37,6 +37,9 @@
          - reboot server
 
   handlers:
+    
+    - name: remove_cass_dir_del
+      shell: rm -rf /var/lib/cassandra/*
 
     - name: reboot server
       shell: sleep 2 && reboot

@@ -5,6 +5,7 @@
 
   vars:
     servicename: cassandra
+    ansible_user: ansible
 
   tasks:
 
