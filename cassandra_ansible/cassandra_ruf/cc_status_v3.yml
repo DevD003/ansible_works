@@ -24,7 +24,8 @@
      register: cassandra_status
    
    - name: Cassandra Service Status Registering
-     command: touch /root/{{ cassandra_status["name"] }}.log  
+     command: touch /root/{{ cassandra_status["name"] }}.log 
+ 
    - copy: 
        dest: /root/{{ cassandra_status["name"] }}.log
        content:
@@ -45,6 +46,11 @@
    
    - name: Casaandra Cluster Details File
      shell: nodetool describecluster > /root/{{ cassandra_status["name"] }}_cluster.log  
-     when: cassandra_status.status.ActiveState == 'active' and cassandra_status.status.MainPID != 0 and cassandra_status.status.Result == 'success'
+     when: cassandra_status.status.ActiveState == 'active' and cassandra_status.status.MainPID != 0 and cassandra_status.status.Result == 'success'i
+
+   - name: cassandra remove node status register
+     shell: nodetool status
+     register: nodetool_status
+     when: inventory_hostname in groups['remove_nodes'] 
 
 

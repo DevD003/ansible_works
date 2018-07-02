@@ -1,0 +1,32 @@
+--- # handlers file for handling misc. fns from the tasks
+
+- name: Reload Firewalld
+  become: yes
+  shell: firewall-cmd --reload 
+
+- name: Restart Firewalld
+  shell: systemctl restart firewalld
+
+- name: Start iptables service
+  service:
+    name: iptables
+    state: started
+
+- name: Restart iptables service
+  service:
+    name: iptables
+    state: restarted 
+ 
+- name: Start Firewalld 
+  service:
+    name: firewalld
+    state: started
+                   
+
+- name: Start Cassandra Service
+  become: yes
+  shell: systemctl restart cassandra  
+
+- name: Save iptable configuration
+  shell: service iptables save
+

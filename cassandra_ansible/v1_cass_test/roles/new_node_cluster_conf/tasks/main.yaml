@@ -70,6 +70,7 @@
   service: 
     name: cassandra
     state: stopped
+  when: inventory_hostname in groups['new_node'] 
 
 - name: Updating Cassandra Configuration << /etc/cassandra/conf/cassandra.yaml >>
   template:
@@ -78,14 +79,14 @@
       owner: "{{cassandra_user}}"
       group: "{{cassandra_group}}"
       mode: 0644
+  when: inventory_hostname in groups['new_node'] 
 
 - name: Clearing Cassandra properties << !! Removing Previous Configurations, Cluster Properties, System Data !!>>
   become: yes 
   shell: rm -rf /var/lib/cassandra/data/system/*
+  when: inventory_hostname in groups['new_node'] 
 
 - name: Restart Cassandra Service
   shell: service cassandra restart
-  
-   
-      
+  when: inventory_hostname in groups['new_node'] 
 
