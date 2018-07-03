@@ -52,7 +52,7 @@
 - name: IPtable configuration - <9042> native transport port
   iptables:
      action: append
-     chain: INPUT
+     chain: INPUT 
      comment: "Cassandra_Native_Transport_port"
      ctstate: NEW,ESTABLISHED
      protocol: tcp

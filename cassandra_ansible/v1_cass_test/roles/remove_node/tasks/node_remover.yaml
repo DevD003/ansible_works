@@ -1,0 +1,40 @@
+---
+   - name: Check if Service Exists
+     stat: 'path=/etc/init.d/{{ servicename }}'
+     register: servicestatus
+
+   - name: Show service status
+     debug: msg='{{ servicename }} service exists.'
+     when: servicestatus.stat.exists 
+
+   - name: ensure cassandra is running
+     service:
+        name: "{{ servicename }}"
+        state: started
+        enabled: yes
+     register: cassandra_status
+   
+   - name: cassandra node status register
+     shell: nodetool status | grep "{{ inventory_hostname }}"
+     register: nodetool_status
+     when: cassandra_status.status.ActiveState == 'active' and inventory_hostname in groups['remove_nodes']
+  
+   - debug: var=nodetool_status.stdout
+     when: inventory_hostname in groups['remove_nodes']
+
+   - set_fact: node_status=UP 
+     when: cassandra_status.status.ActiveState == 'active' and inventory_hostname in groups['remove_nodes'] and nodetool_status.stdout.find('UN') != -1 
+ 
+   - debug: msg="The Node is UP -- Starting Decommission Seq"
+     when: inventory_hostname in groups['remove_nodes'] and node_status == 'UP'
+   
+   - name: --- Decommission Node Seq ---
+     shell: nodetool decommission
+     when: inventory_hostname in groups['remove_nodes'] and node_status == 'UP'
+
+   - name: --- Remove Node Seq ---
+     shell: nodetool removenode
+     when: inventory_hostname in groups['remove_nodes'] and node_status != 'UP'
+        
+   - debug: msg="The Node is DN -- Starting RemoveNode seq"
+     when: inventory_hostname in groups['remove_nodes'] and node_status != 'UP'

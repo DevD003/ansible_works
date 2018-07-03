@@ -35,7 +35,7 @@
 - name: IPtable configuration - <7000> listen port
   iptables:
      action: append
-     chain: INPUT
+     chain: INPUT 
      comment: "Cassandra_listen_port"
      ctstate: NEW,ESTABLISHED
      protocol: tcp
@@ -52,7 +52,7 @@
 - name: IPtable configuration - <9042> native transport port
   iptables:
      action: append
-     chain: INPUT
+     chain: INPUT 
      comment: "Cassandra_Native_Transport_port"
      ctstate: NEW,ESTABLISHED
      protocol: tcp

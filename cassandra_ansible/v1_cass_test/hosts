@@ -6,7 +6,6 @@ peer_nodes
 10.1.53.126
 
 [peer_nodes:children]
-
 active_nodes
 add_nodes
 remove_nodes
@@ -15,7 +14,7 @@ remove_nodes
 10.1.53.141
 
 [add_nodes]
-#10.1.53.127
+10.1.53.127
 
 [remove_nodes]
-10.1.53.127
+

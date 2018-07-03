@@ -1,4 +1,25 @@
---- #<< Main Playbook to Configure Cassandra Cluster in the Given Hosts>>
+--- #<< Main Playbook to Remove Nodes from Cassandra Cluster >>
+
+- name: Ensure Cassandra is running before configuring
+  service:
+    name: cassandra
+    state: started
+  when: inventory_hostname in groups['remove_nodes'] 
+
+- import_tasks: node_remover.yaml
+  when: inventory_hostname in groups['remove_nodes']
+
+- name: Uninstall Cassandra Service
+  yum: 
+   name: cassandra
+   state: absent
+  when: inventory_hostname in groups['remove_node']
+
+- name: Removing configurations, system Data, logs if exist !!
+  become: yes 
+  shell: rm -rf /var/lib/cassandra/*
+  shell: rm -rf /var/log/cassandra/* 
+  when: inventory_hostname in groups['remove_nodes'] 
 
 - name: Removing Port(s) 7000 and 9042 from firewall rules of active nodes in cluster
   firewalld:
@@ -20,8 +41,7 @@
 
 - name: IPtable re-configuration - <7000> listen port
   iptables:
-     chain: cassandra
-     ctstate: NEW,ESTABLISHED
+     chain: INPUT
      protocol: tcp
      match: tcp
      destination_port: 7000
@@ -34,7 +54,7 @@
 
 - name: IPtable re-configuration - <9042> Native-Transport-Port
   iptables:
-     chain: cassandra
+     chain: INPUT 
      protocol: tcp
      match: tcp
      destination_port: 9042
@@ -43,28 +63,5 @@
   with_items:
            - "{{ groups['remove_nodes'] }}" 
   notify:
-     - Save iptable configuration 
+     - Save iptable configuration
 
-- name: Ensure Cassandra is running before configuring
-  service: 
-    name: cassandra
-    state: stopped
-  when: inventory_hostname in groups['remove_nodes'] 
-
-- name: Retrieving node_status
-  shell: nodetool status
-  register: nodetool_status
-  when: inventory_hostname in groups['remove_nodes'] 
-
-
-- name: Uninstall Cassandra Service
-  yum: 
-   name: cassandra
-   state: absent
-  when: inventory_hostname in groups['remove_node'] 
-
-- name: Removing configurations, system Data, logs if exist !!
-  become: yes 
-  shell: rm -rf /var/lib/cassandra/*
-  shell: rm -rf /var/log/cassandra/* 
-  when: inventory_hostname in groups['remove_nodes'] 
