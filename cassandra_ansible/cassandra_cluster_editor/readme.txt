@@ -23,3 +23,9 @@
 
 > ansible-playbook cassandra_remove_node.yml 
 # decommissions node from cluster &&  uninstall cassandra
+
+Notes:
+ -> The name of the cluster can be specified at the [______ :children] at the top of ./hosts file. Name should be in Upper-case* 
+ -> If Ansible to nodes are configured already, details can be skipped except fot the ip address.
+ -> If node details are not specified, change {{ ansible_ssh_host }} to {{ inventory_hostname }} in roles/cassandra_cluster_cfg (or) new_node_cfg /Wait for Server Restarit/host:
+ -> Multi-layer auth. usage when ANSIBLE_KEY_CHECKING=False may result in ---error--- at >> Wait for Server Restart << Comment out or manually reboot server to get around.
