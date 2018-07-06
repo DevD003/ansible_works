@@ -1,4 +1,4 @@
-[Test_Cluter:children]
+[Test_Cluster:children]
 seed_nodes
 peer_nodes
 
@@ -14,7 +14,8 @@ remove_nodes
 10.1.53.141
 
 [add_nodes]
+10.1.53.69
+10.1.53.70
 10.1.53.127
 
 [remove_nodes]
-

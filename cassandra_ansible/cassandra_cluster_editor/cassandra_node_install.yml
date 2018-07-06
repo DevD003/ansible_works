@@ -15,19 +15,14 @@
     - name: Downloading Java
       command: "wget http://18.216.243.34/extra-package/jdk-8u161-linux-x64.rpm"
           
-#    - name: install java
-#      yum: name=jdk-8u161-linux-x64.rpm state=installed 
+    - name: install java
+      yum: name=jdk-8u161-linux-x64.rpm state=latest 
   
     - name: Downloading Cassandra
       command: wget "http://www.apache.org/dist/cassandra/redhat/311x/cassandra-3.11.2-1.noarch.rpm"
 
     - name: Installing Cassandra
       yum: name=cassandra-3.11.2-1.noarch.rpm state=present
-       
-#    - name: Starting Cassandra
-#      service:
-#        name=cassandra
-#        state=started
  
     - name: Changing SeLinux to permissive
       selinux:

@@ -1,0 +1,107 @@
+--- #<< Main Playbook to Remove Nodes from Cassandra Cluster >>
+
+- name: Ensure Cassandra is running before configuring
+  service:
+    name: cassandra
+    state: started
+  when: inventory_hostname in groups['remove_nodes'] 
+
+#############################################################################################################
+- name: Check if Service Exists
+  stat: 'path=/etc/init.d/cassandra'
+  register: servicestatus
+
+- name: Show service status
+  debug: msg='cassandra service exists.'
+  when: servicestatus.stat.exists
+
+- name: ensure cassandra is running
+  service:
+    name: cassandra
+    state: started
+    enabled: yes
+  register: cassandra_status
+
+- name: cassandra node status register
+  shell: nodetool status | grep "{{ inventory_hostname }}"
+  register: nodetool_status
+  when: cassandra_status.status.ActiveState == 'active' and inventory_hostname in groups['remove_nodes']
+
+- debug: var=nodetool_status.stdout
+  when: inventory_hostname in groups['remove_nodes']
+
+- set_fact: node_status=UP
+  when: cassandra_status.status.ActiveState == 'active' and inventory_hostname in groups['remove_nodes'] and nodetool_status.stdout.find('UN') != -1
+
+- debug: msg="The Node is UP -- Starting Decommission Seq"
+  when: inventory_hostname in groups['remove_nodes'] and node_status == 'UP'
+
+- name: --- Decommission Node Seq ---
+  shell: nodetool decommission
+  when: inventory_hostname in groups['remove_nodes'] and node_status == 'UP'
+
+- name: --- Remove Node Seq ---
+  shell: nodetool removenode
+  when: inventory_hostname in groups['remove_nodes'] and node_status != 'UP'
+
+- debug: msg="The Node is DN -- Starting RemoveNode seq"
+  when: inventory_hostname in groups['remove_nodes'] and node_status != 'UP'
+
+#############################################################################################################
+
+- name: Uninstall Cassandra Service
+  yum: 
+   name: cassandra
+   state: absent
+  when: inventory_hostname in groups['remove_nodes']
+
+- name: Removing configurations, system Data, logs if exist !!
+  become: yes 
+  shell: rm -rf /var/lib/cassandra/*
+  shell: rm -rf /var/log/cassandra/* 
+  when: inventory_hostname in groups['remove_nodes'] 
+
+- name: Removing Port(s) 7000 and 9042 from firewall rules of active nodes in cluster
+  firewalld:
+     port: "{{item}}"
+     permanent: true
+     state: disabled
+  with_items:
+     - 7000/tcp
+     - 9042/tcp
+  notify:
+     - Reload Firewalld
+     - Restart Firewalld
+
+- name: Remove Node --- IPtable config reset - <7000> listen port & <9042> Native-Transport-port
+  shell: iptables -F cassandra     
+  when: inventory_hostname in groups['remove_nodes']
+  notify:
+     - Save iptable configuration
+
+- name: IPtable re-configuration - <7000> listen port
+  iptables:
+     chain: INPUT
+     protocol: tcp
+     match: tcp
+     destination_port: 7000
+     source: '{{ item }}'
+     state: absent
+  with_items:
+           - "{{ groups['remove_nodes'] }}"
+  notify:
+     - Save iptable configuration 
+
+- name: IPtable re-configuration - <9042> Native-Transport-Port
+  iptables:
+     chain: INPUT 
+     protocol: tcp
+     match: tcp
+     destination_port: 9042
+     source: '{{ item }}'
+     state: absent
+  with_items:
+           - "{{ groups['remove_nodes'] }}" 
+  notify:
+     - Save iptable configuration
+
