@@ -1,0 +1,35 @@
+---
+ - name: Create do.sh utility
+   template:
+       src: do.sh.j2
+       dest: /usr/bin/do.sh
+       mode: 0744
+   when: inventory_hostname in groups['master']
+
+ - name: ssh config file should be available
+   template: 
+       src: "config.j2" 
+       dest: "~/.ssh/config" 
+       mode: "600"
+
+ - name: start-cluster utility
+   template:
+         src: "spark-cluster.sh.j2" 
+         dest: "/usr/local/spark/sbin/spark-cluster.sh" 
+         mode: 0744
+   when: inventory_hostname in groups['master']
+
+# - name: Executing do.sh
+#   shell: ./do.sh 
+#   args:
+#     chdir: /usr/bin/
+#   when: inventory_hostname in groups['master']
+
+ - name: Starting spark cluster .sh
+   shell: ./spark-cluster.sh --start
+   args:
+      chdir: /usr/local/spark/sbin/
+   when: inventory_hostname in groups['master'] 
+       
+
+

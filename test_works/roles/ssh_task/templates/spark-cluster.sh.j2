@@ -1,0 +1,67 @@
+#!/bin/bash
+
+HOSTS=({% for host in groups['all'] %} {{ host }}.{{ ansible_domain }} {% endfor %})
+
+clear
+
+function exit_with_usage {
+  cat << EOF
+spark-cluster.sh - Manage an Apache Spark cluster and its components
+SYNOPSIS
+usage: spark-cluster.sh [--start | --stop ]
+EOF
+  exit 1
+}
+
+set -e
+
+if [ $# -eq 0 ]; then
+  exit_with_usage
+fi
+
+
+# Process each provided argument configuration
+while [ "${1+defined}" ]; do
+  IFS="=" read -ra PARTS <<< "$1"
+  case "${PARTS[0]}" in
+    --start)
+      START=true
+      shift
+      ;;
+    --stop)
+      STOP=true
+      shift
+      ;;
+    *help* | -h)
+      exit_with_usage
+     exit 0
+     ;;
+    -*)
+     echo "Error: Unknown option: $1" >&2
+     exit 1
+     ;;
+    *)  # No more options
+     break
+     ;;
+  esac
+done
+### Start
+if [ "$START" == "true" ]
+then
+   echo ">>> "
+   echo ">>> Starting services..."
+   echo " "
+   echo ">>> Starting Spark services..."
+   cd $SPARK_HOME && ./sbin/start-all.sh
+   sleep 10s
+fi
+### Stop
+if [ "$STOP" == "true" ]
+then
+   echo ">>> "
+   echo ">>> Stopping services..."
+
+   echo ">>> Stopping SPARK services..."
+   cd $SPARK_HOME && ./sbin/stop-all.sh
+   sleep 5s
+fi
