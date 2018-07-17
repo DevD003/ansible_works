@@ -5,10 +5,10 @@
 cluster_name: "{{ hostvars[inventory_hostname]['group_names'][0] }}"
 
 ### Cassandra Machine Owner ### (default - root)
-cassandra_user: root
+cassandra_user: "{{ cass_user }}"
 
 ### Cassandra Machine Group ### (default - root)
-cassandra_group: root
+cassandra_group: "{{ cass_group }}"
 
 ### Seed_ip(s) ### (Ip addresses of seeds as read from the hosts file)
 seed_ip: "{{ groups['seed_nodes'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(',')  }}"

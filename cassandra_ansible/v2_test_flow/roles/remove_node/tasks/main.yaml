@@ -6,7 +6,8 @@
     state: started
   when: inventory_hostname in groups['remove_nodes'] 
 
-#############################################################################################################
+#######################################################################################
+
 - name: Check if Service Exists
   stat: 'path=/etc/init.d/cassandra'
   register: servicestatus
@@ -47,7 +48,7 @@
 - debug: msg="The Node is DN -- Starting RemoveNode seq"
   when: inventory_hostname in groups['remove_nodes'] and node_status != 'UP'
 
-#############################################################################################################
+#######################################################################################
 
 - name: Uninstall Cassandra Service
   yum: 
@@ -73,11 +74,11 @@
      - Reload Firewalld
      - Restart Firewalld
 
-- name: Remove Node --- IPtable config reset - <7000> listen port & <9042> Native-Transport-port
-  shell: iptables -F cassandra     
-  when: inventory_hostname in groups['remove_nodes']
-  notify:
-     - Save iptable configuration
+#- name: Remove Node --- IPtable config reset - <7000> port & <9042> port
+#  shell: iptables -F cassandra     
+#  when: inventory_hostname in groups['remove_nodes']
+#  notify:
+#     - Save iptable configuration
 
 - name: IPtable re-configuration - <7000> listen port
   iptables:

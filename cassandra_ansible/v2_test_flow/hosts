@@ -1,9 +1,13 @@
+[all:vars]
+cass_user = ansible
+cass_group= ansible
+
 [Test_Cluster:children]
 seed_nodes
 peer_nodes
 
 [seed_nodes]
-10.1.53.126
+10.1.53.30
 
 [peer_nodes:children]
 active_nodes
@@ -11,11 +15,9 @@ add_nodes
 remove_nodes
 
 [active_nodes]
-10.1.53.141
+
 
 [add_nodes]
-10.1.53.69
-10.1.53.70
-10.1.53.127
 
 [remove_nodes]
+10.1.53.29
