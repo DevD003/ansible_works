@@ -1,0 +1,18 @@
+[hdfs-hosts:children]
+namenode
+datanode
+
+[namenode]
+10.1.53.22 ansible_ssh_user=rdops ansible_ssh_pass=rdops@123 ansible_sudo_pass=rdops@123
+
+[datanode:children]
+active_nodes
+add_nodes
+remove_nodes
+
+[active_nodes]
+10.1.53.108 ansible_ssh_user=rdops ansible_ssh_pass=rdops@123 ansible_sudo_pass=rdops@123
+
+[add_nodes]
+
+[remove_nodes]

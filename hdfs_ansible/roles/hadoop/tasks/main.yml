@@ -1,0 +1,96 @@
+---
+- name: Check if hadoop binary exists
+  stat: path=/opt/hadoop-2.9.1.tar.gz
+  register: tar_exists
+
+- name: Download Hadoop binary
+  get_url:
+    url: http://apache.claz.org/hadoop/common/stable/hadoop-2.9.1.tar.gz
+    dest: /opt/
+  when: not tar_exists.stat.exists
+
+- name: check if hadoop file is already there
+  stat: path=/opt/hadoop-2.9.1
+  register: file_exists
+
+- name: Untar hadoop
+  command: tar -xvzf /opt/hadoop-2.9.1.tar.gz -C  /opt
+  when: not file_exists.stat.exists
+
+- name: remove softlink if present
+  command: rm -rf hadoop
+  args:
+    chdir: /opt
+
+- name: create soft link for hadoop
+  command: ln -s hadoop-2.9.1 hadoop
+  args:
+    chdir: /opt
+
+- name: Add hadoop home to bash_profile
+  lineinfile:
+      path: /home/{{ user }}/.bash_profile
+      line: '{{ item }}'
+  with_items:
+      - 'export HADOOP_HOME=/opt/hadoop/'
+      - 'export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin'
+
+- name: Sourcing .bash_profile
+  shell: source /home/{{user}}/.bash_profile
+
+- name: update slaves file in master
+  lineinfile:
+    dest: /opt/hadoop/etc/hadoop/slaves
+    line: "{{ hostvars[item]['ansible_default_ipv4']['address'] }}"
+  with_items: "{{ groups['datanode'] }}"
+  when: inventory_hostname in groups['namenode']
+
+- name: create masters file
+  command: sudo touch masters
+  args:
+    chdir: /opt/hadoop/etc/hadoop/
+  when: inventory_hostname in groups['namenode']
+
+- name: update masters file
+  lineinfile:
+    dest: /opt/hadoop/etc/hadoop/masters
+    line: "{{ hostvars[item]['ansible_default_ipv4']['address'] }}"
+  with_items: "{{ groups['namenode'] }}"
+  when: inventory_hostname in groups['namenode']
+
+#- name: moving template to normal file
+#  command: mv mapred-site.xml.template mapred-site.xml
+#  args:
+#    chdir: /opt/hadoop/etc/hadoop/
+  
+- name: creating hadoop folder structure in namenode
+  command: mkdir -p hadoopdata/hdfs/namenode  
+  args:
+    chdir: /home/{{ user }}/
+  when: inventory_hostname in groups['namenode']
+
+- name: creating hadoop folder structure in datanode
+  command: mkdir -p hadoopdata/hdfs/datanode
+  args:
+    chdir: /home/{{ user }}/
+  when: inventory_hostname in groups['datanode']
+
+- name: setting fact
+  set_fact: namenodeipv4={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+  when: inventory_hostname in groups['namenode'] 
+
+- debug:
+    var: hostvars[item]['ansible_default_ipv4']['address']
+  with_items:
+      - "{{ groups['namenode'] }}" 
+  register: namenodeipv4_item
+
+
+- name: updating core-site.xml files on all nodes
+  template:
+      src: core-site.xml.j2
+      dest: /opt/hadoop/etc/hadoop/core-site.xml
+      owner: root
+      group: root
+      mode: 0644
+ 

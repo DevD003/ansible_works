@@ -1,0 +1,5 @@
+---
+## namenode IP from host file
+#namenodeip: "{{ hostvars [namenode]['ansible_default_ipv4']['address'] }}"
+#namenodeip: "{{ groups[ 'namenode' ] }}"    
+namenodeip: "{{ namenodeipv4_item.result }}" 

@@ -1,0 +1,41 @@
+--- # 
+- hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+#     - name: host ipv4 address
+#       debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
+#       register: namenodeip
+
+     - name: setting fact
+       set_fact: namenodeipv4={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+       when: inventory_hostname in groups['namenode']
+
+     - name: set fact recall
+       debug: var=namenodeipv4
+       when: inventory_hostname in groups['namenode']
+     
+     - name: host ipv4 address
+       debug: var={{ groups['namenode'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(',')  }}
+
+     - debug: 
+         var: hostvars[item]['ansible_default_ipv4']['address']
+       with_items:
+           - "{{ groups['namenode'] }}"
+
+     - name: setting fact
+       set_fact: namenodeipv4={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+       when: inventory_hostname in groups['namenode']
+
+     - name: "Copy fact to other servers"
+       setup:
+       delegate_to: "{{ item }}"
+       delegate_facts: true
+       with_items: "{{ groups.all }}"
+
+     - debug: var=namenodeipv4
+     
+
+#     - debug: var={{ groups['namenode'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) |  }}
+     #- debug: var=hostvars[groups['namenode']]
+          #['ansible_default_ipv4']['address']

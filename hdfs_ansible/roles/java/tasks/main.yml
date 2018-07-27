@@ -1,0 +1,24 @@
+---
+- name: Check the state of Java
+  stat: path=jdk-8u161-linux-x64.rpm
+  register: java_exists
+
+- name: Download Java
+  command: wget http://18.216.243.34/extra-package/jdk-8u161-linux-x64.rpm
+  when: not java_exists.stat.exists
+
+- name: Install java
+  yum: name=jdk-8u161-linux-x64.rpm state=installed
+  when: not java_exists.stat.exists
+
+- name: Add java home to bash_profile
+  lineinfile:
+      path: /home/{{ user }}/.bash_profile
+      line: '{{ item }}'
+  with_items:
+      - 'export JAVA_HOME=/usr/java/jdk1.8.0_161'
+      - 'export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/pnayak/.local/bin:/home/pnayak/bin:/usr/java/jdk1.8.0_161/bin:/usr/local/apache-maven-3.5.0/bin:.'
+      - 'export CLASSPATH=/usr/java/jdk1.8.0_161/lib/tools.jar:/usr/java/jdk1.8.0_161/lib/dt.jar:.'
+
+- name: Sourcing .bash_profile
+  shell: source /home/{{user}}/.bash_profile

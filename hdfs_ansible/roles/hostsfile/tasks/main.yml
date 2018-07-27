@@ -1,0 +1,67 @@
+---
+#editing host file in all the three nodes
+- name: Edit /etc/hosts file
+  blockinfile: 
+    path: /etc/hosts
+    block: |
+      {{ item.ip }} {{ item.name }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+  with_items:
+    - { name: "{{ host1 }}", ip: "{{ ip1 }}" }
+    - { name: "{{ host2 }}", ip: "{{ ip2 }}" }
+    - { name: "{{ host3 }}", ip: "{{ ip3 }}" }
+
+#Installing prerequisites for hdfs cluster
+- name: Install netstat, wget, tools
+  yum: 
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - net-tools
+    - wget
+    - tar
+    - unzip
+    - curl
+    - rpm
+    - ntp  
+#Disable SELINUX
+- name: Disable SELINUX
+  selinux: 
+    policy=targeted
+    state=disabled
+#Restart Server
+#- name: Restart Server
+#  shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+#  async: 1
+#  poll: 0
+#  ignore_errors: True
+#wait for server to restart
+#- name: Wait for Server to Restart
+#  local_action: wait_for
+#       host={{ ansible_ssh_host }}
+#       port=22
+#       state=started
+#       delay=10
+#       timeout=300
+#  become: false 
+#Enable ntpd server and start ntpd server
+- name: start ntpd server
+  shell: sudo systemctl start ntpd 
+- name: enable ntpd server
+  shell: sudo systemctl enable ntpd
+#disable firewalld and iptables
+- name: disable firewalld
+  shell: sudo systemctl disable firewalld
+- name: stop firewalld
+  shell: sudo systemctl stop firewalld
+#- name: stop iptables
+#  shell: sudo systemctl stop iptables.service
+# create an user on all nodes
+- name: adding user
+  user:
+    name: hadoop
+    shell: /bin/bash
+    state: present
+    password: '{{hpassword}}'
+

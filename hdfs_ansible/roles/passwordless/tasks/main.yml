@@ -1,0 +1,45 @@
+---
+#create .ssh directory
+- name: create .ssh directory in user
+  file:
+    path: /home/{{ user }}/.ssh
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0700
+#create authorized key file
+- name: create authorized_keys file
+  file:
+    path: /home/{{ user }}/.ssh/authorized_keys
+    state: touch
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0600
+
+- name: Ensure SSH keys don't already exist
+  stat: 
+    path: /home/{{ user }}/.ssh/id_rsa
+  become: yes
+  become:_user: "{{ user }}"
+  become_method: sudo
+  register: ssh_key
+  tags: 
+    - ssh-keys
+
+- name: Generate SSH keys
+  when: inventory_hostname in groups['namenode'] and ssh_key.stat.exists == False
+  user: name={{ user }} generate_ssh_key=yes
+
+- neme: Get id_rsa.pub
+  when: inventory_hostname in groups['namenode']
+  shell: cat /home/{{ user }}/.ssh/id_rsa.pub
+  register: id_rsa_pub
+
+
+- name: Add authorized keys to all hosts
+  shell: echo {{ id_rsa_pub.stdout }} >> /home/{{ user }}/.ssh/authorized_keys
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ groups['namenode'] }}" 
+    - "{{ groups['datanode'] }}"
+  when: id_rsa_pub.stdout is defined
